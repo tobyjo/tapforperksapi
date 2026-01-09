@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace TapForPerksAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -208,6 +210,64 @@ namespace TapForPerksAPI.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "loyalty_owner",
+                columns: new[] { "id", "address", "created_at", "Description", "metadata", "name" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-1111-1111-1111-111111111111"), "123 High Street, London, UK", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Premium artisan coffee shop chain", null, "The Daily Grind Coffee" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), "456 Market Square, Manchester, UK", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Healthy food and smoothie bar", null, "Fresh Bites Cafe" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "users",
+                columns: new[] { "id", "auth_provider_id", "created_at", "email", "name", "qr_code_value" },
+                values: new object[,]
+                {
+                    { new Guid("99999999-9999-9999-9999-999999999999"), "auth0|user001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "alice@example.com", "Alice Customer", "QR001-ALICE-9999" },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "auth0|user002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "bob@example.com", "Bob Customer", "QR002-BOB-AAAA" },
+                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "auth0|user003", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "charlie@example.com", "Charlie Customer", "QR003-CHARLIE-BBBB" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "loyalty_owner_user",
+                columns: new[] { "id", "auth_provider_id", "created_at", "email", "is_admin", "loyalty_owner_id", "name" },
+                values: new object[,]
+                {
+                    { new Guid("a1111111-1111-1111-1111-111111111111"), "auth0|admin001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@dailygrind.com", true, new Guid("11111111-1111-1111-1111-111111111111"), "John Manager" },
+                    { new Guid("a2222222-2222-2222-2222-222222222222"), "auth0|admin002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@freshbites.com", true, new Guid("22222222-2222-2222-2222-222222222222"), "Sarah Owner" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "loyalty_programme",
+                columns: new[] { "id", "created_at", "is_active", "loyalty_owner_id", "metadata", "name" },
+                values: new object[,]
+                {
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("11111111-1111-1111-1111-111111111111"), null, "Coffee Lovers Club" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("22222222-2222-2222-2222-222222222222"), null, "Healthy Habits Rewards" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "reward",
+                columns: new[] { "id", "cost_points", "created_at", "is_active", "loyalty_programme_id", "max_scans", "metadata", "name", "reward_type" },
+                values: new object[,]
+                {
+                    { new Guid("55555555-5555-5555-5555-555555555555"), 10, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), null, null, "Free Coffee", "points" },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), null, null, "Free Pastry", "points" },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), 10, null, "10th Coffee Free", "stamp" },
+                    { new Guid("88888888-8888-8888-8888-888888888888"), 8, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("44444444-4444-4444-4444-444444444444"), null, null, "Free Smoothie", "points" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "user_balance",
+                columns: new[] { "id", "balance", "last_updated", "loyalty_programme_id", "user_id" },
+                values: new object[,]
+                {
+                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), 7, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-3333-3333-3333-333333333333"), new Guid("99999999-9999-9999-9999-999999999999") },
+                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), 12, new DateTime(2026, 1, 6, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-3333-3333-3333-333333333333"), new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") },
+                    { new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), 5, new DateTime(2026, 1, 7, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("44444444-4444-4444-4444-444444444444"), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") }
                 });
 
             migrationBuilder.CreateIndex(

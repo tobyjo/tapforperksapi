@@ -12,8 +12,8 @@ using TapForPerksAPI.DbContexts;
 namespace TapForPerksAPI.Migrations
 {
     [DbContext(typeof(TapForPerksContext))]
-    [Migration("20260109125716_InitalCreate")]
-    partial class InitalCreate
+    [Migration("20260109172823_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,7 +46,8 @@ namespace TapForPerksAPI.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Description");
 
                     b.Property<string>("Metadata")
                         .HasColumnType("nvarchar(max)")
@@ -62,6 +63,24 @@ namespace TapForPerksAPI.Migrations
                         .HasName("PK__loyalty___3213E83FEC734646");
 
                     b.ToTable("loyalty_owner", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Address = "123 High Street, London, UK",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Premium artisan coffee shop chain",
+                            Name = "The Daily Grind Coffee"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Address = "456 Market Square, Manchester, UK",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Healthy food and smoothie bar",
+                            Name = "Fresh Bites Cafe"
+                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyOwnerUser", b =>
@@ -110,6 +129,28 @@ namespace TapForPerksAPI.Migrations
                     b.HasIndex(new[] { "LoyaltyOwnerId" }, "idx_loyalty_owner_user_owner_id");
 
                     b.ToTable("loyalty_owner_user", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a1111111-1111-1111-1111-111111111111"),
+                            AuthProviderId = "auth0|admin001",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@dailygrind.com",
+                            IsAdmin = true,
+                            LoyaltyOwnerId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Name = "John Manager"
+                        },
+                        new
+                        {
+                            Id = new Guid("a2222222-2222-2222-2222-222222222222"),
+                            AuthProviderId = "auth0|admin002",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@freshbites.com",
+                            IsAdmin = true,
+                            LoyaltyOwnerId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Name = "Sarah Owner"
+                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyProgramme", b =>
@@ -150,6 +191,24 @@ namespace TapForPerksAPI.Migrations
                     b.HasIndex(new[] { "LoyaltyOwnerId" }, "idx_loyalty_programme_owner_id");
 
                     b.ToTable("loyalty_programme", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LoyaltyOwnerId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Name = "Coffee Lovers Club"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LoyaltyOwnerId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Name = "Healthy Habits Rewards"
+                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.Reward", b =>
@@ -206,6 +265,48 @@ namespace TapForPerksAPI.Migrations
                     b.HasIndex(new[] { "LoyaltyProgrammeId" }, "idx_reward_programme_id");
 
                     b.ToTable("reward", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            CostPoints = 10,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Name = "Free Coffee",
+                            RewardType = "points"
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            CostPoints = 5,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Name = "Free Pastry",
+                            RewardType = "points"
+                        },
+                        new
+                        {
+                            Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            MaxScans = 10,
+                            Name = "10th Coffee Free",
+                            RewardType = "stamp"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                            CostPoints = 8,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            LoyaltyProgrammeId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Name = "Free Smoothie",
+                            RewardType = "points"
+                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.RewardRedemption", b =>
@@ -347,6 +448,35 @@ namespace TapForPerksAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            AuthProviderId = "auth0|user001",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "alice@example.com",
+                            Name = "Alice Customer",
+                            QrCodeValue = "QR001-ALICE-9999"
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            AuthProviderId = "auth0|user002",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "bob@example.com",
+                            Name = "Bob Customer",
+                            QrCodeValue = "QR002-BOB-AAAA"
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            AuthProviderId = "auth0|user003",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "charlie@example.com",
+                            Name = "Charlie Customer",
+                            QrCodeValue = "QR003-CHARLIE-BBBB"
+                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.UserBalance", b =>
@@ -386,6 +516,32 @@ namespace TapForPerksAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("user_balance", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            Balance = 7,
+                            LastUpdated = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            UserId = new Guid("99999999-9999-9999-9999-999999999999")
+                        },
+                        new
+                        {
+                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            Balance = 12,
+                            LastUpdated = new DateTime(2026, 1, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            UserId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+                        },
+                        new
+                        {
+                            Id = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                            Balance = 5,
+                            LastUpdated = new DateTime(2026, 1, 7, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LoyaltyProgrammeId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            UserId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyOwnerUser", b =>
