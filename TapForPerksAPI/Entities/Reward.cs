@@ -15,8 +15,6 @@ public class Reward
 
     public int? CostPoints { get; set; }
 
-    public int? MaxScans { get; set; }
-
     public string? Metadata { get; set; }
 
     public bool IsActive { get; set; }

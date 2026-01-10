@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TapForPerksAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitalCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -99,7 +99,6 @@ namespace TapForPerksAPI.Migrations
                     name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     reward_type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     cost_points = table.Column<int>(type: "int", nullable: true),
-                    max_scans = table.Column<int>(type: "int", nullable: true),
                     metadata = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
@@ -218,7 +217,7 @@ namespace TapForPerksAPI.Migrations
                 values: new object[,]
                 {
                     { new Guid("11111111-1111-1111-1111-111111111111"), "123 High Street, London, UK", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Premium artisan coffee shop chain", null, "The Daily Grind Coffee" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), "456 Market Square, Manchester, UK", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Healthy food and smoothie bar", null, "Fresh Bites Cafe" }
+                    { new Guid("22222222-2222-2222-2222-222222222222"), "456 Market Square, Manchester, UK", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Private event", null, "Smith-Jones Wedding" }
                 });
 
             migrationBuilder.InsertData(
@@ -236,8 +235,8 @@ namespace TapForPerksAPI.Migrations
                 columns: new[] { "id", "auth_provider_id", "created_at", "email", "is_admin", "loyalty_owner_id", "name" },
                 values: new object[,]
                 {
-                    { new Guid("a1111111-1111-1111-1111-111111111111"), "auth0|admin001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@dailygrind.com", true, new Guid("11111111-1111-1111-1111-111111111111"), "John Manager" },
-                    { new Guid("a2222222-2222-2222-2222-222222222222"), "auth0|admin002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@freshbites.com", true, new Guid("22222222-2222-2222-2222-222222222222"), "Sarah Owner" }
+                    { new Guid("a1111111-1111-1111-1111-111111111111"), "auth0|admin001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "baristaone@dailygrind.com", true, new Guid("11111111-1111-1111-1111-111111111111"), "Barista One" },
+                    { new Guid("a2222222-2222-2222-2222-222222222222"), "auth0|admin002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "host@wedding.com", true, new Guid("22222222-2222-2222-2222-222222222222"), "Wedding Host" }
                 });
 
             migrationBuilder.InsertData(
@@ -245,30 +244,24 @@ namespace TapForPerksAPI.Migrations
                 columns: new[] { "id", "created_at", "is_active", "loyalty_owner_id", "metadata", "name" },
                 values: new object[,]
                 {
-                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("11111111-1111-1111-1111-111111111111"), null, "Coffee Lovers Club" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("22222222-2222-2222-2222-222222222222"), null, "Healthy Habits Rewards" }
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("11111111-1111-1111-1111-111111111111"), null, "Coffee Loyalty Programme" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("22222222-2222-2222-2222-222222222222"), null, "Wedding Drink Allowance" }
                 });
 
             migrationBuilder.InsertData(
                 table: "reward",
-                columns: new[] { "id", "cost_points", "created_at", "is_active", "loyalty_programme_id", "max_scans", "metadata", "name", "reward_type" },
-                values: new object[,]
-                {
-                    { new Guid("55555555-5555-5555-5555-555555555555"), 10, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), null, null, "Free Coffee", "points" },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), null, null, "Free Pastry", "points" },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), 10, null, "10th Coffee Free", "stamp" },
-                    { new Guid("88888888-8888-8888-8888-888888888888"), 8, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("44444444-4444-4444-4444-444444444444"), null, null, "Free Smoothie", "points" }
-                });
+                columns: new[] { "id", "cost_points", "created_at", "is_active", "loyalty_programme_id", "metadata", "name", "reward_type" },
+                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("33333333-3333-3333-3333-333333333333"), null, "Free Coffee at 5 points", "points" });
 
             migrationBuilder.InsertData(
-                table: "user_balance",
-                columns: new[] { "id", "balance", "last_updated", "loyalty_programme_id", "user_id" },
-                values: new object[,]
-                {
-                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), 7, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-3333-3333-3333-333333333333"), new Guid("99999999-9999-9999-9999-999999999999") },
-                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), 12, new DateTime(2026, 1, 6, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-3333-3333-3333-333333333333"), new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") },
-                    { new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"), 5, new DateTime(2026, 1, 7, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("44444444-4444-4444-4444-444444444444"), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") }
-                });
+                table: "reward",
+                columns: new[] { "id", "cost_points", "created_at", "loyalty_programme_id", "metadata", "name", "reward_type" },
+                values: new object[] { new Guid("66666666-6666-6666-6666-666666666666"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("33333333-3333-3333-3333-333333333333"), null, "Free Pastry at 5 points", "points" });
+
+            migrationBuilder.InsertData(
+                table: "reward",
+                columns: new[] { "id", "cost_points", "created_at", "is_active", "loyalty_programme_id", "metadata", "name", "reward_type" },
+                values: new object[] { new Guid("88888888-8888-8888-8888-888888888888"), 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("44444444-4444-4444-4444-444444444444"), null, "Wedding Drink Allowance of 2 drinks", "allowance_limit" });
 
             migrationBuilder.CreateIndex(
                 name: "idx_loyalty_owner_user_owner_id",

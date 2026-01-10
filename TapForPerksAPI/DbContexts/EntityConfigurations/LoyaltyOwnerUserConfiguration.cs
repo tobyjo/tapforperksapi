@@ -52,8 +52,8 @@ public class LoyaltyOwnerUserConfiguration : IEntityTypeConfiguration<LoyaltyOwn
                 Id = Guid.Parse("a1111111-1111-1111-1111-111111111111"),
                 LoyaltyOwnerId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 AuthProviderId = "auth0|admin001",
-                Email = "admin@dailygrind.com",
-                Name = "John Manager",
+                Email = "baristaone@dailygrind.com",
+                Name = "Barista One",
                 IsAdmin = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
@@ -62,8 +62,8 @@ public class LoyaltyOwnerUserConfiguration : IEntityTypeConfiguration<LoyaltyOwn
                 Id = Guid.Parse("a2222222-2222-2222-2222-222222222222"),
                 LoyaltyOwnerId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 AuthProviderId = "auth0|admin002",
-                Email = "admin@freshbites.com",
-                Name = "Sarah Owner",
+                Email = "host@wedding.com",
+                Name = "Wedding Host",
                 IsAdmin = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }

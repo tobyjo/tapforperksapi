@@ -75,8 +75,8 @@ namespace TapForPerksAPI.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             Address = "456 Market Square, Manchester, UK",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Healthy food and smoothie bar",
-                            Name = "Fresh Bites Cafe"
+                            Description = "Private event",
+                            Name = "Smith-Jones Wedding"
                         });
                 });
 
@@ -133,20 +133,20 @@ namespace TapForPerksAPI.Migrations
                             Id = new Guid("a1111111-1111-1111-1111-111111111111"),
                             AuthProviderId = "auth0|admin001",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin@dailygrind.com",
+                            Email = "baristaone@dailygrind.com",
                             IsAdmin = true,
                             LoyaltyOwnerId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Name = "John Manager"
+                            Name = "Barista One"
                         },
                         new
                         {
                             Id = new Guid("a2222222-2222-2222-2222-222222222222"),
                             AuthProviderId = "auth0|admin002",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin@freshbites.com",
+                            Email = "host@wedding.com",
                             IsAdmin = true,
                             LoyaltyOwnerId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Sarah Owner"
+                            Name = "Wedding Host"
                         });
                 });
 
@@ -196,7 +196,7 @@ namespace TapForPerksAPI.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             LoyaltyOwnerId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Name = "Coffee Lovers Club"
+                            Name = "Coffee Loyalty Programme"
                         },
                         new
                         {
@@ -204,7 +204,7 @@ namespace TapForPerksAPI.Migrations
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             LoyaltyOwnerId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "Healthy Habits Rewards"
+                            Name = "Wedding Drink Allowance"
                         });
                 });
 
@@ -236,10 +236,6 @@ namespace TapForPerksAPI.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("loyalty_programme_id");
 
-                    b.Property<int?>("MaxScans")
-                        .HasColumnType("int")
-                        .HasColumnName("max_scans");
-
                     b.Property<string>("Metadata")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("metadata");
@@ -267,11 +263,11 @@ namespace TapForPerksAPI.Migrations
                         new
                         {
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
-                            CostPoints = 10,
+                            CostPoints = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            Name = "Free Coffee",
+                            Name = "Free Coffee at 5 points",
                             RewardType = "points"
                         },
                         new
@@ -279,30 +275,20 @@ namespace TapForPerksAPI.Migrations
                             Id = new Guid("66666666-6666-6666-6666-666666666666"),
                             CostPoints = 5,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
+                            IsActive = false,
                             LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            Name = "Free Pastry",
+                            Name = "Free Pastry at 5 points",
                             RewardType = "points"
-                        },
-                        new
-                        {
-                            Id = new Guid("77777777-7777-7777-7777-777777777777"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            MaxScans = 10,
-                            Name = "10th Coffee Free",
-                            RewardType = "stamp"
                         },
                         new
                         {
                             Id = new Guid("88888888-8888-8888-8888-888888888888"),
-                            CostPoints = 8,
+                            CostPoints = 2,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             LoyaltyProgrammeId = new Guid("44444444-4444-4444-4444-444444444444"),
-                            Name = "Free Smoothie",
-                            RewardType = "points"
+                            Name = "Wedding Drink Allowance of 2 drinks",
+                            RewardType = "allowance_limit"
                         });
                 });
 
@@ -513,32 +499,6 @@ namespace TapForPerksAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("user_balance", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
-                            Balance = 7,
-                            LastUpdated = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
-                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            UserId = new Guid("99999999-9999-9999-9999-999999999999")
-                        },
-                        new
-                        {
-                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
-                            Balance = 12,
-                            LastUpdated = new DateTime(2026, 1, 6, 0, 0, 0, 0, DateTimeKind.Utc),
-                            LoyaltyProgrammeId = new Guid("33333333-3333-3333-3333-333333333333"),
-                            UserId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-                        },
-                        new
-                        {
-                            Id = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
-                            Balance = 5,
-                            LastUpdated = new DateTime(2026, 1, 7, 0, 0, 0, 0, DateTimeKind.Utc),
-                            LoyaltyProgrammeId = new Guid("44444444-4444-4444-4444-444444444444"),
-                            UserId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
-                        });
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyOwnerUser", b =>

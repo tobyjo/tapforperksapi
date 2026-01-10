@@ -47,8 +47,8 @@ public class LoyaltyOwnerConfiguration : IEntityTypeConfiguration<LoyaltyOwner>
             new LoyaltyOwner
             {
                 Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Name = "Fresh Bites Cafe",
-                Description = "Healthy food and smoothie bar",
+                Name = "Smith-Jones Wedding",
+                Description = "Private event",
                 Address = "456 Market Square, Manchester, UK",
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }

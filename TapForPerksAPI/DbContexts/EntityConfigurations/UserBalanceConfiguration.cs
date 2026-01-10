@@ -44,6 +44,7 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
             .HasConstraintName("fk_user_balance_user");
 
         // Seed data
+        /*
         builder.HasData(
             new UserBalance
             {
@@ -69,6 +70,8 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
                 Balance = 5,
                 LastUpdated = new DateTime(2026, 1, 7, 0, 0, 0, DateTimeKind.Utc)
             }
+        
         );
+        */
     }
 }

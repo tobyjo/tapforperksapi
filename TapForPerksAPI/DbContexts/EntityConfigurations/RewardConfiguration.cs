@@ -32,9 +32,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
         builder.Property(e => e.LoyaltyProgrammeId)
             .HasColumnName("loyalty_programme_id");
 
-        builder.Property(e => e.MaxScans)
-            .HasColumnName("max_scans");
-
+       
         builder.Property(e => e.Metadata)
             .HasColumnName("metadata");
 
@@ -57,17 +55,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
             {
                 Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
                 LoyaltyProgrammeId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Name = "Free Coffee",
-                RewardType = "points",
-                CostPoints = 10,
-                IsActive = true,
-                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new Reward
-            {
-                Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
-                LoyaltyProgrammeId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Name = "Free Pastry",
+                Name = "Free Coffee at 5 points",
                 RewardType = "points",
                 CostPoints = 5,
                 IsActive = true,
@@ -75,21 +63,21 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
             },
             new Reward
             {
-                Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
+                Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
                 LoyaltyProgrammeId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Name = "10th Coffee Free",
-                RewardType = "stamp",
-                MaxScans = 10,
-                IsActive = true,
+                Name = "Free Pastry at 5 points",
+                RewardType = "points",
+                CostPoints = 5,
+                IsActive = false,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
             new Reward
             {
                 Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 LoyaltyProgrammeId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                Name = "Free Smoothie",
-                RewardType = "points",
-                CostPoints = 8,
+                Name = "Wedding Drink Allowance of 2 drinks",
+                RewardType = "allowance_limit",
+                CostPoints = 2,
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
