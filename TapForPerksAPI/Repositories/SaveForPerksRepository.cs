@@ -5,11 +5,11 @@ using TapForPerksAPI.Entities;
 
 namespace TapForPerksAPI.Repositories
 {
-    public class TapForPerksRepository : ITapForPerksRepository
+    public class SaveForPerksRepository : ISaveForPerksRepository
     {
 
         private readonly TapForPerksContext _context;
-        public TapForPerksRepository(TapForPerksContext context)
+        public SaveForPerksRepository(TapForPerksContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -26,14 +26,14 @@ namespace TapForPerksAPI.Repositories
         }
   
 
-        public async Task<ScanEvent?> GetScanEventAsync(Guid loyaltyProgrammeId, Guid scanEventId)
+        public async Task<ScanEvent?> GetScanEventAsync(Guid rewardId, Guid scanEventId)
         {
             return await _context.ScanEvents
-                .Where(se => se.LoyaltyProgrammeId == loyaltyProgrammeId && se.Id == scanEventId)
+                .Where(se => se.RewardId == rewardId && se.Id == scanEventId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task AddScanEvent(ScanEvent scanEvent)
+        public async Task CreateScanEvent(ScanEvent scanEvent)
         {
             if (scanEvent == null)
             {
@@ -50,6 +50,28 @@ namespace TapForPerksAPI.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Reward?> GetRewardAsync(Guid rewardId)
+        {
+            return await _context.Rewards
+                .Where(lp => lp.Id == rewardId)
+                .FirstOrDefaultAsync();
+        } 
+
+        public async Task<UserBalance?> GetUserBalanceAsync(Guid userId, Guid rewardId)
+        {
+            return await _context.UserBalances
+                .Where(ub => ub.UserId == userId && ub.RewardId == rewardId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task CreateUserBalance(UserBalance userBalance)
+        {
+            if (userBalance == null)
+            {
+                throw new ArgumentNullException(nameof(userBalance));
+            }
+            await _context.UserBalances.AddAsync(userBalance);
+        }
 
     }
 }

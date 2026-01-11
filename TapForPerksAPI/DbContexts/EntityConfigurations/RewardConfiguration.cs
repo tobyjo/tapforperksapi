@@ -1,18 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TapForPerksAPI.Entities;
+using TapForPerksAPI.Extensions;
 
 namespace TapForPerksAPI.DbContexts.EntityConfigurations;
 
-public class LoyaltyProgrammeConfiguration : IEntityTypeConfiguration<LoyaltyProgramme>
+public class RewardConfiguration : IEntityTypeConfiguration<Reward>
 {
-    public void Configure(EntityTypeBuilder<LoyaltyProgramme> builder)
+    public void Configure(EntityTypeBuilder<Reward> builder)
     {
         builder.HasKey(e => e.Id).HasName("PK__loyalty___3213E83F9D47D4D7");
 
-        builder.ToTable("loyalty_programme");
+        builder.ToTable("reward");
 
-        builder.HasIndex(e => e.LoyaltyOwnerId, "idx_loyalty_programme_owner_id");
+        builder.HasIndex(e => e.LoyaltyOwnerId, "idx_loyalty_owner_id");
 
         builder.Property(e => e.Id)
             .HasDefaultValueSql("(newid())")
@@ -28,13 +29,16 @@ public class LoyaltyProgrammeConfiguration : IEntityTypeConfiguration<LoyaltyPro
         builder.Property(e => e.LoyaltyOwnerId)
             .HasColumnName("loyalty_owner_id");
 
-
         builder.Property(e => e.CostPoints)
             .HasColumnName("cost_points");
 
+        // Store enum as string with snake_case conversion
         builder.Property(e => e.RewardType)
             .HasMaxLength(100)
-            .HasColumnName("reward_type");
+            .HasColumnName("reward_type")
+            .HasConversion(
+                v => v.ToString().ToSnakeCase(), // Enum to DB
+                v => Enum.Parse<RewardType>(v.ToPascalCase())); // DB to Enum
 
         builder.Property(e => e.Metadata)
             .HasColumnName("metadata");
@@ -44,29 +48,29 @@ public class LoyaltyProgrammeConfiguration : IEntityTypeConfiguration<LoyaltyPro
             .HasColumnName("name");
 
         builder.HasOne(d => d.LoyaltyOwner)
-            .WithMany(p => p.LoyaltyProgrammes)
+            .WithMany(p => p.Rewards)
             .HasForeignKey(d => d.LoyaltyOwnerId)
-            .HasConstraintName("fk_loyalty_programme_owner");
+            .HasConstraintName("fk_loyalty_owner");
 
-        // Seed data
+        // Seed data using enum
         builder.HasData(
-            new LoyaltyProgramme
+            new Reward
             {
                 Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 LoyaltyOwnerId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 Name = "Free Coffee at 5 points",
                 CostPoints = 5,
-                RewardType = "points",
+                RewardType = RewardType.IncrementalPoints,
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
-            new LoyaltyProgramme
+            new Reward
             {
                 Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
                 LoyaltyOwnerId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Name = "Wedding Drink Allowance of 2 drinks",
                 CostPoints = 2,
-                RewardType = "allowance_limit",
+                RewardType = RewardType.AllowanceLimit,
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }

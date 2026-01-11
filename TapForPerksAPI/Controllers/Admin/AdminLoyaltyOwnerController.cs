@@ -10,10 +10,10 @@ namespace TapForPerksAPI.Controllers.Admin
     [Route("api/admin")]
     public class AdminLoyaltyOwnerController : ControllerBase
     {
-        private readonly ITapForPerksRepository tapForPerksRepository;
+        private readonly ISaveForPerksRepository tapForPerksRepository;
         private readonly IMapper mapper;
 
-        public AdminLoyaltyOwnerController(ITapForPerksRepository tapForPerksRepository, IMapper mapper)
+        public AdminLoyaltyOwnerController(ISaveForPerksRepository tapForPerksRepository, IMapper mapper)
         {
             this.tapForPerksRepository = tapForPerksRepository ?? throw new ArgumentNullException(nameof(tapForPerksRepository));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

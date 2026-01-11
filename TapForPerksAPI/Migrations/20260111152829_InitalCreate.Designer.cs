@@ -12,7 +12,7 @@ using TapForPerksAPI.DbContexts;
 namespace TapForPerksAPI.Migrations
 {
     [DbContext(typeof(TapForPerksContext))]
-    [Migration("20260111110016_InitalCreate")]
+    [Migration("20260111152829_InitalCreate")]
     partial class InitalCreate
     {
         /// <inheritdoc />
@@ -153,7 +153,7 @@ namespace TapForPerksAPI.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyProgramme", b =>
+            modelBuilder.Entity("TapForPerksAPI.Entities.Reward", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -198,9 +198,9 @@ namespace TapForPerksAPI.Migrations
                     b.HasKey("Id")
                         .HasName("PK__loyalty___3213E83F9D47D4D7");
 
-                    b.HasIndex(new[] { "LoyaltyOwnerId" }, "idx_loyalty_programme_owner_id");
+                    b.HasIndex(new[] { "LoyaltyOwnerId" }, "idx_loyalty_owner_id");
 
-                    b.ToTable("loyalty_programme", (string)null);
+                    b.ToTable("reward", (string)null);
 
                     b.HasData(
                         new
@@ -211,7 +211,7 @@ namespace TapForPerksAPI.Migrations
                             IsActive = true,
                             LoyaltyOwnerId = new Guid("11111111-1111-1111-1111-111111111111"),
                             Name = "Free Coffee at 5 points",
-                            RewardType = "points"
+                            RewardType = "incremental_points"
                         },
                         new
                         {
@@ -237,15 +237,15 @@ namespace TapForPerksAPI.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("loyalty_owner_user_id");
 
-                    b.Property<Guid>("LoyaltyProgrammeId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("loyalty_programme_id");
-
                     b.Property<DateTime>("RedeemedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("redeemed_at")
                         .HasDefaultValueSql("(sysdatetime())");
+
+                    b.Property<Guid>("RewardId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("reward_id");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier")
@@ -256,7 +256,7 @@ namespace TapForPerksAPI.Migrations
 
                     b.HasIndex("LoyaltyOwnerUserId");
 
-                    b.HasIndex(new[] { "LoyaltyProgrammeId" }, "idx_reward_redemption_programme_id");
+                    b.HasIndex(new[] { "RewardId" }, "idx_reward_redemption_reward_id");
 
                     b.HasIndex(new[] { "UserId" }, "idx_reward_redemption_user_id");
 
@@ -275,10 +275,6 @@ namespace TapForPerksAPI.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("loyalty_owner_user_id");
 
-                    b.Property<Guid>("LoyaltyProgrammeId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("loyalty_programme_id");
-
                     b.Property<int>("PointsChange")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -289,6 +285,10 @@ namespace TapForPerksAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("qr_code_value");
+
+                    b.Property<Guid>("RewardId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("reward_id");
 
                     b.Property<DateTime>("ScannedAt")
                         .ValueGeneratedOnAdd()
@@ -305,7 +305,7 @@ namespace TapForPerksAPI.Migrations
 
                     b.HasIndex("LoyaltyOwnerUserId");
 
-                    b.HasIndex(new[] { "LoyaltyProgrammeId" }, "idx_scan_event_programme_id");
+                    b.HasIndex(new[] { "RewardId" }, "idx_scan_event_programme_id");
 
                     b.HasIndex(new[] { "UserId" }, "idx_scan_event_user_id");
 
@@ -412,9 +412,9 @@ namespace TapForPerksAPI.Migrations
                         .HasColumnName("last_updated")
                         .HasDefaultValueSql("(sysdatetime())");
 
-                    b.Property<Guid>("LoyaltyProgrammeId")
+                    b.Property<Guid>("RewardId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("loyalty_programme_id");
+                        .HasColumnName("reward_id");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier")
@@ -423,11 +423,11 @@ namespace TapForPerksAPI.Migrations
                     b.HasKey("Id")
                         .HasName("PK__user_bal__3213E83F23104F90");
 
-                    b.HasIndex(new[] { "LoyaltyProgrammeId" }, "idx_user_balance_programme_id");
+                    b.HasIndex(new[] { "RewardId" }, "idx_user_balance_programme_id");
 
                     b.HasIndex(new[] { "UserId" }, "idx_user_balance_user_id");
 
-                    b.HasIndex(new[] { "UserId", "LoyaltyProgrammeId" }, "uq_user_balance")
+                    b.HasIndex(new[] { "UserId", "RewardId" }, "uq_user_balance")
                         .IsUnique();
 
                     b.ToTable("user_balance", (string)null);
@@ -445,14 +445,14 @@ namespace TapForPerksAPI.Migrations
                     b.Navigation("LoyaltyOwner");
                 });
 
-            modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyProgramme", b =>
+            modelBuilder.Entity("TapForPerksAPI.Entities.Reward", b =>
                 {
                     b.HasOne("TapForPerksAPI.Entities.LoyaltyOwner", "LoyaltyOwner")
-                        .WithMany("LoyaltyProgrammes")
+                        .WithMany("Rewards")
                         .HasForeignKey("LoyaltyOwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_loyalty_programme_owner");
+                        .HasConstraintName("fk_loyalty_owner");
 
                     b.Navigation("LoyaltyOwner");
                 });
@@ -464,9 +464,9 @@ namespace TapForPerksAPI.Migrations
                         .HasForeignKey("LoyaltyOwnerUserId")
                         .HasConstraintName("fk_reward_redemption_owner_user");
 
-                    b.HasOne("TapForPerksAPI.Entities.LoyaltyProgramme", "LoyaltyProgramme")
+                    b.HasOne("TapForPerksAPI.Entities.Reward", "Reward")
                         .WithMany("RewardRedemptions")
-                        .HasForeignKey("LoyaltyProgrammeId")
+                        .HasForeignKey("RewardId")
                         .IsRequired()
                         .HasConstraintName("fk_reward_redemption_programme");
 
@@ -479,7 +479,7 @@ namespace TapForPerksAPI.Migrations
 
                     b.Navigation("LoyaltyOwnerUser");
 
-                    b.Navigation("LoyaltyProgramme");
+                    b.Navigation("Reward");
 
                     b.Navigation("User");
                 });
@@ -491,9 +491,9 @@ namespace TapForPerksAPI.Migrations
                         .HasForeignKey("LoyaltyOwnerUserId")
                         .HasConstraintName("fk_scan_event_owner_user");
 
-                    b.HasOne("TapForPerksAPI.Entities.LoyaltyProgramme", "LoyaltyProgramme")
+                    b.HasOne("TapForPerksAPI.Entities.Reward", "Reward")
                         .WithMany("ScanEvents")
-                        .HasForeignKey("LoyaltyProgrammeId")
+                        .HasForeignKey("RewardId")
                         .IsRequired()
                         .HasConstraintName("fk_scan_event_programme");
 
@@ -506,16 +506,16 @@ namespace TapForPerksAPI.Migrations
 
                     b.Navigation("LoyaltyOwnerUser");
 
-                    b.Navigation("LoyaltyProgramme");
+                    b.Navigation("Reward");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.UserBalance", b =>
                 {
-                    b.HasOne("TapForPerksAPI.Entities.LoyaltyProgramme", "LoyaltyProgramme")
+                    b.HasOne("TapForPerksAPI.Entities.Reward", "Reward")
                         .WithMany("UserBalances")
-                        .HasForeignKey("LoyaltyProgrammeId")
+                        .HasForeignKey("RewardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_balance_programme");
@@ -527,7 +527,7 @@ namespace TapForPerksAPI.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_user_balance_user");
 
-                    b.Navigation("LoyaltyProgramme");
+                    b.Navigation("Reward");
 
                     b.Navigation("User");
                 });
@@ -536,7 +536,7 @@ namespace TapForPerksAPI.Migrations
                 {
                     b.Navigation("LoyaltyOwnerUsers");
 
-                    b.Navigation("LoyaltyProgrammes");
+                    b.Navigation("Rewards");
                 });
 
             modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyOwnerUser", b =>
@@ -546,7 +546,7 @@ namespace TapForPerksAPI.Migrations
                     b.Navigation("ScanEvents");
                 });
 
-            modelBuilder.Entity("TapForPerksAPI.Entities.LoyaltyProgramme", b =>
+            modelBuilder.Entity("TapForPerksAPI.Entities.Reward", b =>
                 {
                     b.Navigation("RewardRedemptions");
 

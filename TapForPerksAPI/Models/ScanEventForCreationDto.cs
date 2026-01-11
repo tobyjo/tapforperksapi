@@ -3,7 +3,7 @@
     public class ScanEventForCreationDto
     {
         
-        public Guid LoyaltyProgrammeId { get; set; }
+        public Guid RewardId { get; set; }
 
         public Guid? LoyaltyOwnerUserId { get; set; }
 

@@ -12,7 +12,7 @@ public class ScanEventConfiguration : IEntityTypeConfiguration<ScanEvent>
 
         builder.ToTable("scan_event");
 
-        builder.HasIndex(e => e.LoyaltyProgrammeId, "idx_scan_event_programme_id");
+        builder.HasIndex(e => e.RewardId, "idx_scan_event_programme_id");
         builder.HasIndex(e => e.UserId, "idx_scan_event_user_id");
 
         builder.Property(e => e.Id)
@@ -22,8 +22,8 @@ public class ScanEventConfiguration : IEntityTypeConfiguration<ScanEvent>
         builder.Property(e => e.LoyaltyOwnerUserId)
             .HasColumnName("loyalty_owner_user_id");
 
-        builder.Property(e => e.LoyaltyProgrammeId)
-            .HasColumnName("loyalty_programme_id");
+        builder.Property(e => e.RewardId)
+            .HasColumnName("reward_id");
 
         builder.Property(e => e.PointsChange)
             .HasDefaultValue(1)
@@ -44,9 +44,9 @@ public class ScanEventConfiguration : IEntityTypeConfiguration<ScanEvent>
             .HasForeignKey(d => d.LoyaltyOwnerUserId)
             .HasConstraintName("fk_scan_event_owner_user");
 
-        builder.HasOne(d => d.LoyaltyProgramme)
+        builder.HasOne(d => d.Reward)
             .WithMany(p => p.ScanEvents)
-            .HasForeignKey(d => d.LoyaltyProgrammeId)
+            .HasForeignKey(d => d.RewardId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("fk_scan_event_programme");
 

@@ -13,7 +13,7 @@ namespace TapForPerksAPI.Profiles
             CreateMap<Models.LoyaltyOwnerDto, Entities.LoyaltyOwner>()
                 .ForMember(dest => dest.Metadata, opt => opt.Ignore())
                 .ForMember(dest => dest.LoyaltyOwnerUsers, opt => opt.Ignore())
-                .ForMember(dest => dest.LoyaltyProgrammes, opt => opt.Ignore());
+                .ForMember(dest => dest.Rewards, opt => opt.Ignore());
         }
     }
 }

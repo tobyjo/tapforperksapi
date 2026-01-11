@@ -69,15 +69,15 @@ namespace TapForPerksAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "loyalty_programme",
+                name: "reward",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     loyalty_owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    reward_type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    cost_points = table.Column<int>(type: "int", nullable: true),
                     is_active = table.Column<bool>(type: "bit", nullable: false),
+                    cost_points = table.Column<int>(type: "int", nullable: true),
+                    reward_type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     metadata = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
                 },
@@ -85,7 +85,7 @@ namespace TapForPerksAPI.Migrations
                 {
                     table.PrimaryKey("PK__loyalty___3213E83F9D47D4D7", x => x.id);
                     table.ForeignKey(
-                        name: "fk_loyalty_programme_owner",
+                        name: "fk_loyalty_owner",
                         column: x => x.loyalty_owner_id,
                         principalTable: "loyalty_owner",
                         principalColumn: "id",
@@ -98,7 +98,7 @@ namespace TapForPerksAPI.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    loyalty_programme_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     loyalty_owner_user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     redeemed_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
                 },
@@ -112,8 +112,8 @@ namespace TapForPerksAPI.Migrations
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_reward_redemption_programme",
-                        column: x => x.loyalty_programme_id,
-                        principalTable: "loyalty_programme",
+                        column: x => x.reward_id,
+                        principalTable: "reward",
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_reward_redemption_user",
@@ -129,7 +129,7 @@ namespace TapForPerksAPI.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    loyalty_programme_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     loyalty_owner_user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     qr_code_value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     scanned_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())"),
@@ -145,8 +145,8 @@ namespace TapForPerksAPI.Migrations
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_scan_event_programme",
-                        column: x => x.loyalty_programme_id,
-                        principalTable: "loyalty_programme",
+                        column: x => x.reward_id,
+                        principalTable: "reward",
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_scan_event_user",
@@ -162,7 +162,7 @@ namespace TapForPerksAPI.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    loyalty_programme_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     balance = table.Column<int>(type: "int", nullable: false),
                     last_updated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
                 },
@@ -171,8 +171,8 @@ namespace TapForPerksAPI.Migrations
                     table.PrimaryKey("PK__user_bal__3213E83F23104F90", x => x.id);
                     table.ForeignKey(
                         name: "fk_user_balance_programme",
-                        column: x => x.loyalty_programme_id,
-                        principalTable: "loyalty_programme",
+                        column: x => x.reward_id,
+                        principalTable: "reward",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -212,11 +212,11 @@ namespace TapForPerksAPI.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "loyalty_programme",
+                table: "reward",
                 columns: new[] { "id", "cost_points", "created_at", "is_active", "loyalty_owner_id", "metadata", "name", "reward_type" },
                 values: new object[,]
                 {
-                    { new Guid("33333333-3333-3333-3333-333333333333"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("11111111-1111-1111-1111-111111111111"), null, "Free Coffee at 5 points", "points" },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("11111111-1111-1111-1111-111111111111"), null, "Free Coffee at 5 points", "incremental_points" },
                     { new Guid("44444444-4444-4444-4444-444444444444"), 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("22222222-2222-2222-2222-222222222222"), null, "Wedding Drink Allowance of 2 drinks", "allowance_limit" }
                 });
 
@@ -226,14 +226,14 @@ namespace TapForPerksAPI.Migrations
                 column: "loyalty_owner_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_loyalty_programme_owner_id",
-                table: "loyalty_programme",
+                name: "idx_loyalty_owner_id",
+                table: "reward",
                 column: "loyalty_owner_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_reward_redemption_programme_id",
+                name: "idx_reward_redemption_reward_id",
                 table: "reward_redemption",
-                column: "loyalty_programme_id");
+                column: "reward_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_reward_redemption_user_id",
@@ -248,7 +248,7 @@ namespace TapForPerksAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "idx_scan_event_programme_id",
                 table: "scan_event",
-                column: "loyalty_programme_id");
+                column: "reward_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_scan_event_user_id",
@@ -263,7 +263,7 @@ namespace TapForPerksAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "idx_user_balance_programme_id",
                 table: "user_balance",
-                column: "loyalty_programme_id");
+                column: "reward_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_user_balance_user_id",
@@ -273,7 +273,7 @@ namespace TapForPerksAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "uq_user_balance",
                 table: "user_balance",
-                columns: new[] { "user_id", "loyalty_programme_id" },
+                columns: new[] { "user_id", "reward_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -311,7 +311,7 @@ namespace TapForPerksAPI.Migrations
                 name: "loyalty_owner_user");
 
             migrationBuilder.DropTable(
-                name: "loyalty_programme");
+                name: "reward");
 
             migrationBuilder.DropTable(
                 name: "users");

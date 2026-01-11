@@ -2,13 +2,13 @@ using AutoMapper;
 
 namespace TapForPerksAPI.Profiles;
 
-public class LoyaltyProgrammeProfile : Profile
+public class RewardProfile : Profile
 {
-    public LoyaltyProgrammeProfile()
+    public RewardProfile()
     {
-        CreateMap<Entities.LoyaltyProgramme, Models.LoyaltyProgrammeDto>();
+        CreateMap<Entities.Reward, Models.RewardDto>();
         
-        CreateMap<Models.LoyaltyProgrammeDto, Entities.LoyaltyProgramme>()
+        CreateMap<Models.RewardDto, Entities.Reward>()
             .ForMember(dest => dest.Metadata, opt => opt.Ignore())
             .ForMember(dest => dest.LoyaltyOwner, opt => opt.Ignore())
             .ForMember(dest => dest.RewardRedemptions, opt => opt.Ignore())

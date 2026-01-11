@@ -18,5 +18,5 @@ public class LoyaltyOwner
 
     public virtual ICollection<LoyaltyOwnerUser> LoyaltyOwnerUsers { get; set; } = new List<LoyaltyOwnerUser>();
 
-    public virtual ICollection<LoyaltyProgramme> LoyaltyProgrammes { get; set; } = new List<LoyaltyProgramme>();
+    public virtual ICollection<Reward> Rewards { get; set; } = new List<Reward>();
 }
