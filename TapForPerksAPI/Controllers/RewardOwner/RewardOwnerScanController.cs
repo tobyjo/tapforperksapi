@@ -3,17 +3,17 @@ using Microsoft.AspNetCore.Mvc;
 using TapForPerksAPI.Models;
 using TapForPerksAPI.Repositories;
 
-namespace TapForPerksAPI.Controllers.LoyaltyOwner
+namespace TapForPerksAPI.Controllers.RewardOwner
 {
     [ApiController]
-    [Route("api/lo/scans")]
-    public class LoyaltyOwnerScanController : ControllerBase
+    [Route("api/rewardowner/scans")]
+    public class RewardOwnerScanController : ControllerBase
     {
         private readonly ISaveForPerksRepository saveForPerksRepository;
         private readonly IMapper mapper;
 
     
-        public LoyaltyOwnerScanController(ISaveForPerksRepository saveForPerksRepository, IMapper mapper)
+        public RewardOwnerScanController(ISaveForPerksRepository saveForPerksRepository, IMapper mapper)
         {
             this.saveForPerksRepository = saveForPerksRepository ?? throw new ArgumentNullException(nameof(saveForPerksRepository));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -118,12 +118,9 @@ namespace TapForPerksAPI.Controllers.LoyaltyOwner
         }
 
         [HttpGet("History")]
-        public async Task<ActionResult<IEnumerable<LoyaltyOwnerDto>>> GetScansHistoryForReward()
+        public async Task<ActionResult<IEnumerable<RewardOwnerDto>>> GetScansHistoryForReward()
         {
-            /*
-            var loyaltyOwners = await tapForPerksRepository.GetLoyaltyOwnersAsync();
-            var results = mapper.Map<IEnumerable<LoyaltyOwnerDto>>(loyaltyOwners);
-            */
+       
             return Ok(true);
         }
     }

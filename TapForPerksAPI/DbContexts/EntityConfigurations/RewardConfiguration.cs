@@ -9,12 +9,11 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
 {
     public void Configure(EntityTypeBuilder<Reward> builder)
     {
-        builder.HasKey(e => e.Id).HasName("PK__loyalty___3213E83F9D47D4D7");
+        builder.HasKey(e => e.Id).HasName("PK__reward___3213E83F9D47D4D7");
 
         builder.ToTable("reward");
 
-        builder.HasIndex(e => e.LoyaltyOwnerId, "idx_loyalty_owner_id");
-
+        builder.HasIndex(e => e.RewardOwnerId, "idx_reward_owner_id");
         builder.Property(e => e.Id)
             .HasDefaultValueSql("(newid())")
             .HasColumnName("id");
@@ -26,8 +25,8 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
         builder.Property(e => e.IsActive)
             .HasColumnName("is_active");
 
-        builder.Property(e => e.LoyaltyOwnerId)
-            .HasColumnName("loyalty_owner_id");
+        builder.Property(e => e.RewardOwnerId)
+            .HasColumnName("reward_owner_id");
 
         builder.Property(e => e.CostPoints)
             .HasColumnName("cost_points");
@@ -47,17 +46,17 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
             .HasMaxLength(255)
             .HasColumnName("name");
 
-        builder.HasOne(d => d.LoyaltyOwner)
+        builder.HasOne(d => d.RewardOwner)
             .WithMany(p => p.Rewards)
-            .HasForeignKey(d => d.LoyaltyOwnerId)
-            .HasConstraintName("fk_loyalty_owner");
+            .HasForeignKey(d => d.RewardOwnerId)
+            .HasConstraintName("fk_reward_owner");
 
         // Seed data using enum
         builder.HasData(
             new Reward
             {
                 Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                LoyaltyOwnerId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                RewardOwnerId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 Name = "Free Coffee at 5 points",
                 CostPoints = 5,
                 RewardType = RewardType.IncrementalPoints,
@@ -67,7 +66,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
             new Reward
             {
                 Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                LoyaltyOwnerId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                RewardOwnerId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Name = "Wedding Drink Allowance of 2 drinks",
                 CostPoints = 2,
                 RewardType = RewardType.AllowanceLimit,

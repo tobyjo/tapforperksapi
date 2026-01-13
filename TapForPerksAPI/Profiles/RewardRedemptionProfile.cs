@@ -9,7 +9,7 @@ public class RewardRedemptionProfile : Profile
         CreateMap<Entities.RewardRedemption, Models.RewardRedemptionDto>();
         
         CreateMap<Models.RewardRedemptionDto, Entities.RewardRedemption>()
-            .ForMember(dest => dest.LoyaltyOwnerUser, opt => opt.Ignore())
+            .ForMember(dest => dest.RewardOwnerUser, opt => opt.Ignore())
             .ForMember(dest => dest.Reward, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore());
     }

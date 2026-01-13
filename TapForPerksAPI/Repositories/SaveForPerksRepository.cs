@@ -20,9 +20,9 @@ namespace TapForPerksAPI.Repositories
         }
 
 
-        public async Task<IEnumerable<LoyaltyOwner>> GetLoyaltyOwnersAsync()
+        public async Task<IEnumerable<RewardOwner>> GetRewardOwnersAsync()
         {
-            return await _context.LoyaltyOwners.OrderBy(lo => lo.Name).ToListAsync();
+            return await _context.RewardOwners.OrderBy(lo => lo.Name).ToListAsync();
         }
   
 

@@ -1,9 +1,9 @@
 namespace TapForPerksAPI.Models
 {
-    public class LoyaltyOwnerUserDto
+    public class RewardOwnerUserDto
     {
         public Guid Id { get; set; }
-        public Guid LoyaltyOwnerId { get; set; }
+        public Guid RewardOwnerId { get; set; }
         public string AuthProviderId { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;

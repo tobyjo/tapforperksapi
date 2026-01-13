@@ -2,17 +2,17 @@
 
 namespace TapForPerksAPI.Profiles
 {
-    public class LoyaltyOwnerProfile : Profile
+    public class RewardOwnerProfile : Profile
     {
-        public LoyaltyOwnerProfile()
+        public RewardOwnerProfile()
         {
             // From database entity to DTO
-            CreateMap<Entities.LoyaltyOwner, Models.LoyaltyOwnerDto>();
+            CreateMap<Entities.RewardOwner, Models.RewardOwnerDto>();
 
             // From DTO to database entity
-            CreateMap<Models.LoyaltyOwnerDto, Entities.LoyaltyOwner>()
+            CreateMap<Models.RewardOwnerDto, Entities.RewardOwner>()
                 .ForMember(dest => dest.Metadata, opt => opt.Ignore())
-                .ForMember(dest => dest.LoyaltyOwnerUsers, opt => opt.Ignore())
+                .ForMember(dest => dest.RewardOwnerUsers, opt => opt.Ignore())
                 .ForMember(dest => dest.Rewards, opt => opt.Ignore());
         }
     }

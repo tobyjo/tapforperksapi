@@ -12,11 +12,11 @@ public class RewardRedemption
 
     public Guid RewardId { get; set; }
 
-    public Guid? LoyaltyOwnerUserId { get; set; }
+    public Guid? RewardOwnerUserId { get; set; }
 
     public DateTime RedeemedAt { get; set; }
 
-    public virtual LoyaltyOwnerUser? LoyaltyOwnerUser { get; set; }
+    public virtual RewardOwnerUser? RewardOwnerUser { get; set; }
 
     public virtual Reward Reward { get; set; } = null!;
 

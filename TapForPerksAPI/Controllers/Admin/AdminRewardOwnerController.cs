@@ -8,22 +8,22 @@ namespace TapForPerksAPI.Controllers.Admin
 {
     [ApiController]
     [Route("api/admin")]
-    public class AdminLoyaltyOwnerController : ControllerBase
+    public class AdminRewardOwnerController : ControllerBase
     {
         private readonly ISaveForPerksRepository tapForPerksRepository;
         private readonly IMapper mapper;
 
-        public AdminLoyaltyOwnerController(ISaveForPerksRepository tapForPerksRepository, IMapper mapper)
+        public AdminRewardOwnerController(ISaveForPerksRepository tapForPerksRepository, IMapper mapper)
         {
             this.tapForPerksRepository = tapForPerksRepository ?? throw new ArgumentNullException(nameof(tapForPerksRepository));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet("GetLoyaltyOwners")]
-        public async Task<ActionResult<IEnumerable<LoyaltyOwnerDto>>> GetLoyaltyOwners()
+        [HttpGet("GetRewardOwners")]
+        public async Task<ActionResult<IEnumerable<RewardOwnerDto>>> GetRewardOwners()
         {
-            var loyaltyOwners = await tapForPerksRepository.GetLoyaltyOwnersAsync();
-            var results = mapper.Map<IEnumerable<LoyaltyOwnerDto>>(loyaltyOwners);
+            var rewardOwners = await tapForPerksRepository.GetRewardOwnersAsync();
+            var results = mapper.Map<IEnumerable<RewardOwnerDto>>(rewardOwners);
    
             return Ok(results);
         }

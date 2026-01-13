@@ -3,7 +3,7 @@ namespace TapForPerksAPI.Models
     public class RewardDto
     {
         public Guid Id { get; set; }
-        public Guid LoyaltyOwnerId { get; set; }
+        public Guid RewardOwnerId { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public string RewardType { get; set; } = string.Empty;

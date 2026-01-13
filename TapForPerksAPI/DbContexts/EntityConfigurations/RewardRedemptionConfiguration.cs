@@ -19,8 +19,8 @@ public class RewardRedemptionConfiguration : IEntityTypeConfiguration<RewardRede
             .HasDefaultValueSql("(newid())")
             .HasColumnName("id");
 
-        builder.Property(e => e.LoyaltyOwnerUserId)
-            .HasColumnName("loyalty_owner_user_id");
+        builder.Property(e => e.RewardOwnerUserId)
+            .HasColumnName("reward_owner_user_id");
 
         builder.Property(e => e.RewardId)
             .HasColumnName("reward_id");
@@ -32,9 +32,9 @@ public class RewardRedemptionConfiguration : IEntityTypeConfiguration<RewardRede
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 
-        builder.HasOne(d => d.LoyaltyOwnerUser)
+        builder.HasOne(d => d.RewardOwnerUser)
             .WithMany(p => p.RewardRedemptions)
-            .HasForeignKey(d => d.LoyaltyOwnerUserId)
+            .HasForeignKey(d => d.RewardOwnerUserId)
             .HasConstraintName("fk_reward_redemption_owner_user");
 
         builder.HasOne(d => d.Reward)

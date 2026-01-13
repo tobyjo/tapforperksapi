@@ -6,6 +6,18 @@ using TapForPerksAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel to listen on both HTTP and HTTPS
+/*
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenLocalhost(5040); // HTTP
+    options.ListenLocalhost(7040, listenOptions =>
+    {
+        listenOptions.UseHttps(); // HTTPS
+    });
+});
+*/
+
 // Add services to the container.
 builder.Services.AddDbContext<TapForPerksContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -33,7 +45,25 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// Configure CORS for all environments (not just Development)
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+if (allowedOrigins != null && allowedOrigins.Length > 0)
+{
+    // inMemoryLogger.Log($"CORS: Configuring allowed origins: {string.Join(", ", allowedOrigins)}");
+
+    app.UseCors(corsBuilder =>
+    corsBuilder
+   .WithOrigins(allowedOrigins)
+      .AllowAnyMethod()
+     .AllowAnyHeader()
+   .AllowCredentials());
+}
+else
+{
+   // inMemoryLogger.Log("CORS: No allowed origins configured");
+}
+
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

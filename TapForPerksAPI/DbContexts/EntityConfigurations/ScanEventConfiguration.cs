@@ -19,8 +19,8 @@ public class ScanEventConfiguration : IEntityTypeConfiguration<ScanEvent>
             .HasDefaultValueSql("(newid())")
             .HasColumnName("id");
 
-        builder.Property(e => e.LoyaltyOwnerUserId)
-            .HasColumnName("loyalty_owner_user_id");
+        builder.Property(e => e.RewardOwnerUserId)
+            .HasColumnName("reward_owner_user_id");
 
         builder.Property(e => e.RewardId)
             .HasColumnName("reward_id");
@@ -39,9 +39,9 @@ public class ScanEventConfiguration : IEntityTypeConfiguration<ScanEvent>
         builder.Property(e => e.QrCodeValue)
          .HasColumnName("qr_code_value");
 
-        builder.HasOne(d => d.LoyaltyOwnerUser)
+        builder.HasOne(d => d.RewardOwnerUser)
             .WithMany(p => p.ScanEvents)
-            .HasForeignKey(d => d.LoyaltyOwnerUserId)
+            .HasForeignKey(d => d.RewardOwnerUserId)
             .HasConstraintName("fk_scan_event_owner_user");
 
         builder.HasOne(d => d.Reward)

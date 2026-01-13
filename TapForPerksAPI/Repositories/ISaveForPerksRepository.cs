@@ -7,7 +7,7 @@ namespace TapForPerksAPI.Repositories
     {
         Task<bool> SaveChangesAsync();
 
-        Task<IEnumerable<LoyaltyOwner>> GetLoyaltyOwnersAsync();
+        Task<IEnumerable<RewardOwner>> GetRewardOwnersAsync();
 
         Task<ScanEvent?> GetScanEventAsync(Guid rewardId, Guid scanEventId);
 

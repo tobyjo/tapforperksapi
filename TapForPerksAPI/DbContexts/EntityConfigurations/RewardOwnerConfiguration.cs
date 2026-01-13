@@ -4,13 +4,13 @@ using TapForPerksAPI.Entities;
 
 namespace TapForPerksAPI.DbContexts.EntityConfigurations;
 
-public class LoyaltyOwnerConfiguration : IEntityTypeConfiguration<LoyaltyOwner>
+public class RewardOwnerConfiguration : IEntityTypeConfiguration<RewardOwner>
 {
-    public void Configure(EntityTypeBuilder<LoyaltyOwner> builder)
+    public void Configure(EntityTypeBuilder<RewardOwner> builder)
     {
-        builder.HasKey(e => e.Id).HasName("PK__loyalty___3213E83FEC734646");
+        builder.HasKey(e => e.Id).HasName("PK__reward___3213E83FEC734646");
 
-        builder.ToTable("loyalty_owner");
+        builder.ToTable("reward_owner");
 
         builder.Property(e => e.Id)
             .HasDefaultValueSql("(newid())")
@@ -36,7 +36,7 @@ public class LoyaltyOwnerConfiguration : IEntityTypeConfiguration<LoyaltyOwner>
 
         // Seed data
         builder.HasData(
-            new LoyaltyOwner
+            new RewardOwner
             {
                 Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 Name = "The Daily Grind Coffee",
@@ -44,7 +44,7 @@ public class LoyaltyOwnerConfiguration : IEntityTypeConfiguration<LoyaltyOwner>
                 Address = "123 High Street, London, UK",
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
-            new LoyaltyOwner
+            new RewardOwner
             {
                 Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Name = "Smith-Jones Wedding",

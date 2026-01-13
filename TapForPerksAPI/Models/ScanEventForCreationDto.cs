@@ -5,10 +5,10 @@
         
         public Guid RewardId { get; set; }
 
-        public Guid? LoyaltyOwnerUserId { get; set; }
+        public Guid? RewardOwnerUserId { get; set; }
 
         public string QrCodeValue { get; set; } = null!;
 
-        public int PointsChange { get; set; }   // LO may want to reward more points than normal
+        public int PointsChange { get; set; }   // Bought more than 1 coffee
     }
 }

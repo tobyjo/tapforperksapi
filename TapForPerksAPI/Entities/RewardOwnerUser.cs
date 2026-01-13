@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace TapForPerksAPI.Entities;
 
-public class LoyaltyOwnerUser
+public class RewardOwnerUser
 {
     public Guid Id { get; set; }
 
-    public Guid LoyaltyOwnerId { get; set; }
+    public Guid RewardOwnerId { get; set; }
 
     public string AuthProviderId { get; set; } = null!;
 
@@ -19,7 +19,7 @@ public class LoyaltyOwnerUser
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual LoyaltyOwner LoyaltyOwner { get; set; } = null!;
+    public virtual RewardOwner RewardOwner { get; set; } = null!;
 
     public virtual ICollection<RewardRedemption> RewardRedemptions { get; set; } = new List<RewardRedemption>();
 

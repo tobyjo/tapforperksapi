@@ -14,7 +14,7 @@ namespace TapForPerksAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "loyalty_owner",
+                name: "reward_owner",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
@@ -26,7 +26,7 @@ namespace TapForPerksAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__loyalty___3213E83FEC734646", x => x.id);
+                    table.PrimaryKey("PK__reward___3213E83FEC734646", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -46,34 +46,11 @@ namespace TapForPerksAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "loyalty_owner_user",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    loyalty_owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    auth_provider_id = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    is_admin = table.Column<bool>(type: "bit", nullable: false),
-                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__loyalty___3213E83FCA9F25E5", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_loyalty_owner_user_owner",
-                        column: x => x.loyalty_owner_id,
-                        principalTable: "loyalty_owner",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "reward",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    loyalty_owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     is_active = table.Column<bool>(type: "bit", nullable: false),
                     cost_points = table.Column<int>(type: "int", nullable: true),
@@ -83,75 +60,34 @@ namespace TapForPerksAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__loyalty___3213E83F9D47D4D7", x => x.id);
+                    table.PrimaryKey("PK__reward___3213E83F9D47D4D7", x => x.id);
                     table.ForeignKey(
-                        name: "fk_loyalty_owner",
-                        column: x => x.loyalty_owner_id,
-                        principalTable: "loyalty_owner",
+                        name: "fk_reward_owner",
+                        column: x => x.reward_owner_id,
+                        principalTable: "reward_owner",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "reward_redemption",
+                name: "reward_owner_user",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    loyalty_owner_user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    redeemed_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
+                    reward_owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    auth_provider_id = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    is_admin = table.Column<bool>(type: "bit", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__reward_r__3213E83FC9ADA235", x => x.id);
+                    table.PrimaryKey("PK__reward___3213E83FCA9F25E5", x => x.id);
                     table.ForeignKey(
-                        name: "fk_reward_redemption_owner_user",
-                        column: x => x.loyalty_owner_user_id,
-                        principalTable: "loyalty_owner_user",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_reward_redemption_programme",
-                        column: x => x.reward_id,
-                        principalTable: "reward",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_reward_redemption_user",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "scan_event",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    loyalty_owner_user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    qr_code_value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    scanned_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())"),
-                    points_change = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__scan_eve__3213E83F45201827", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_scan_event_owner_user",
-                        column: x => x.loyalty_owner_user_id,
-                        principalTable: "loyalty_owner_user",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_scan_event_programme",
-                        column: x => x.reward_id,
-                        principalTable: "reward",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_scan_event_user",
-                        column: x => x.user_id,
-                        principalTable: "users",
+                        name: "fk_reward_owner_user_owner",
+                        column: x => x.reward_owner_id,
+                        principalTable: "reward_owner",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -183,8 +119,72 @@ namespace TapForPerksAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "reward_redemption",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_owner_user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    redeemed_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__reward_r__3213E83FC9ADA235", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_reward_redemption_owner_user",
+                        column: x => x.reward_owner_user_id,
+                        principalTable: "reward_owner_user",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_reward_redemption_programme",
+                        column: x => x.reward_id,
+                        principalTable: "reward",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_reward_redemption_user",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "scan_event",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    reward_owner_user_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    qr_code_value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    scanned_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())"),
+                    points_change = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__scan_eve__3213E83F45201827", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_scan_event_owner_user",
+                        column: x => x.reward_owner_user_id,
+                        principalTable: "reward_owner_user",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_scan_event_programme",
+                        column: x => x.reward_id,
+                        principalTable: "reward",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_scan_event_user",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
-                table: "loyalty_owner",
+                table: "reward_owner",
                 columns: new[] { "id", "address", "created_at", "Description", "metadata", "name" },
                 values: new object[,]
                 {
@@ -203,32 +203,32 @@ namespace TapForPerksAPI.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "loyalty_owner_user",
-                columns: new[] { "id", "auth_provider_id", "created_at", "email", "is_admin", "loyalty_owner_id", "name" },
+                table: "reward",
+                columns: new[] { "id", "cost_points", "created_at", "is_active", "metadata", "name", "reward_owner_id", "reward_type" },
                 values: new object[,]
                 {
-                    { new Guid("a1111111-1111-1111-1111-111111111111"), "auth0|admin001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "baristaone@dailygrind.com", true, new Guid("11111111-1111-1111-1111-111111111111"), "Barista One" },
-                    { new Guid("a2222222-2222-2222-2222-222222222222"), "auth0|admin002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "host@wedding.com", true, new Guid("22222222-2222-2222-2222-222222222222"), "Wedding Host" }
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, null, "Free Coffee at 5 points", new Guid("11111111-1111-1111-1111-111111111111"), "incremental_points" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, null, "Wedding Drink Allowance of 2 drinks", new Guid("22222222-2222-2222-2222-222222222222"), "allowance_limit" }
                 });
 
             migrationBuilder.InsertData(
-                table: "reward",
-                columns: new[] { "id", "cost_points", "created_at", "is_active", "loyalty_owner_id", "metadata", "name", "reward_type" },
+                table: "reward_owner_user",
+                columns: new[] { "id", "auth_provider_id", "created_at", "email", "is_admin", "name", "reward_owner_id" },
                 values: new object[,]
                 {
-                    { new Guid("33333333-3333-3333-3333-333333333333"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("11111111-1111-1111-1111-111111111111"), null, "Free Coffee at 5 points", "incremental_points" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, new Guid("22222222-2222-2222-2222-222222222222"), null, "Wedding Drink Allowance of 2 drinks", "allowance_limit" }
+                    { new Guid("a1111111-1111-1111-1111-111111111111"), "auth0|admin001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "baristaone@dailygrind.com", true, "Barista One", new Guid("11111111-1111-1111-1111-111111111111") },
+                    { new Guid("a2222222-2222-2222-2222-222222222222"), "auth0|admin002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "host@wedding.com", true, "Wedding Host", new Guid("22222222-2222-2222-2222-222222222222") }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "idx_loyalty_owner_user_owner_id",
-                table: "loyalty_owner_user",
-                column: "loyalty_owner_id");
+                name: "idx_reward_owner_id",
+                table: "reward",
+                column: "reward_owner_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_loyalty_owner_id",
-                table: "reward",
-                column: "loyalty_owner_id");
+                name: "idx_reward_owner_user_owner_id",
+                table: "reward_owner_user",
+                column: "reward_owner_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_reward_redemption_reward_id",
@@ -241,9 +241,9 @@ namespace TapForPerksAPI.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_reward_redemption_loyalty_owner_user_id",
+                name: "IX_reward_redemption_reward_owner_user_id",
                 table: "reward_redemption",
-                column: "loyalty_owner_user_id");
+                column: "reward_owner_user_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_scan_event_programme_id",
@@ -256,9 +256,9 @@ namespace TapForPerksAPI.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_scan_event_loyalty_owner_user_id",
+                name: "IX_scan_event_reward_owner_user_id",
                 table: "scan_event",
-                column: "loyalty_owner_user_id");
+                column: "reward_owner_user_id");
 
             migrationBuilder.CreateIndex(
                 name: "idx_user_balance_programme_id",
@@ -308,7 +308,7 @@ namespace TapForPerksAPI.Migrations
                 name: "user_balance");
 
             migrationBuilder.DropTable(
-                name: "loyalty_owner_user");
+                name: "reward_owner_user");
 
             migrationBuilder.DropTable(
                 name: "reward");
@@ -317,7 +317,7 @@ namespace TapForPerksAPI.Migrations
                 name: "users");
 
             migrationBuilder.DropTable(
-                name: "loyalty_owner");
+                name: "reward_owner");
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TapForPerksAPI.Entities;
 
-public class LoyaltyOwner
+public class RewardOwner
 {
     public Guid Id { get; set; }
 
@@ -16,7 +16,7 @@ public class LoyaltyOwner
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<LoyaltyOwnerUser> LoyaltyOwnerUsers { get; set; } = new List<LoyaltyOwnerUser>();
+    public virtual ICollection<RewardOwnerUser> RewardOwnerUsers { get; set; } = new List<RewardOwnerUser>();
 
     public virtual ICollection<Reward> Rewards { get; set; } = new List<Reward>();
 }
