@@ -19,7 +19,7 @@ namespace TapForPerksAPI.Controllers.Admin
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet("GetRewardOwners")]
+        [HttpGet("reward-owners")]
         public async Task<ActionResult<IEnumerable<RewardOwnerDto>>> GetRewardOwners()
         {
             var rewardOwners = await tapForPerksRepository.GetRewardOwnersAsync();

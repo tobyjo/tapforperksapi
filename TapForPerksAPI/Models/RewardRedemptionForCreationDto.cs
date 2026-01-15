@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace TapForPerksAPI.Models
 {
-    public class ScanEventForCreationDto
+    public class RewardRedemptionForCreationDto
     {
+
         [Required(ErrorMessage = "Reward ID is required")]
         public Guid RewardId { get; set; }
 
@@ -13,11 +14,8 @@ namespace TapForPerksAPI.Models
         [Required(ErrorMessage = "QR Code value is required")]
         public string QrCodeValue { get; set; } = null!;
 
-        [Required(ErrorMessage = "Points change is required")]
-        [Range(1, 10, ErrorMessage = "Points change must be at least 1")]
-        public int PointsChange { get; set; }   // Bought more than 1 coffee
-
-        [Range(0, 10, ErrorMessage = "NumRewardsToClaim must be no more than 10")]
+        [Required(ErrorMessage = "NumRewardsToClaim is required")]
+        [Range(1, 10, ErrorMessage = "NumRewardsToClaim must be at least 1")]
         public int NumRewardsToClaim { get; set; }
     }
 }

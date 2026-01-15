@@ -57,7 +57,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
             {
                 Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 RewardOwnerId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Name = "Free Coffee at 5 points",
+                Name = "Pay for 5 coffees, get sixth free",
                 CostPoints = 5,
                 RewardType = RewardType.IncrementalPoints,
                 IsActive = true,

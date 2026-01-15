@@ -9,7 +9,7 @@ public class Reward
     public Guid RewardOwnerId { get; set; }
     public string Name { get; set; } = null!;
     public bool IsActive { get; set; }
-    public int? CostPoints { get; set; }
+    public int CostPoints { get; set; }
     public RewardType RewardType { get; set; }  // Changed from string to enum
     public string? Metadata { get; set; }
     public DateTime CreatedAt { get; set; }

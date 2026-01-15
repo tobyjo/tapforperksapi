@@ -30,7 +30,7 @@ namespace TapForPerksAPI.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<int?>("CostPoints")
+                    b.Property<int>("CostPoints")
                         .HasColumnType("int")
                         .HasColumnName("cost_points");
 

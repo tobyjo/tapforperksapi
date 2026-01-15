@@ -53,7 +53,7 @@ namespace TapForPerksAPI.Migrations
                     reward_owner_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     is_active = table.Column<bool>(type: "bit", nullable: false),
-                    cost_points = table.Column<int>(type: "int", nullable: true),
+                    cost_points = table.Column<int>(type: "int", nullable: false),
                     reward_type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     metadata = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(sysdatetime())")

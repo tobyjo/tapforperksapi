@@ -2,20 +2,26 @@
 using Microsoft.AspNetCore.Mvc;
 using TapForPerksAPI.Models;
 using TapForPerksAPI.Repositories;
+using TapForPerksAPI.Services;
 
 namespace TapForPerksAPI.Controllers.RewardOwner
 {
     [ApiController]
-    [Route("api/rewardowner/scans")]
+    [Route("api/reward-owner/scans")]
     public class RewardOwnerScanController : ControllerBase
     {
         private readonly ISaveForPerksRepository saveForPerksRepository;
+        private readonly IRewardService rewardService;
         private readonly IMapper mapper;
 
     
-        public RewardOwnerScanController(ISaveForPerksRepository saveForPerksRepository, IMapper mapper)
+        public RewardOwnerScanController(
+            ISaveForPerksRepository saveForPerksRepository, 
+            IRewardService rewardService,
+            IMapper mapper)
         {
             this.saveForPerksRepository = saveForPerksRepository ?? throw new ArgumentNullException(nameof(saveForPerksRepository));
+            this.rewardService = rewardService ?? throw new ArgumentNullException(nameof(rewardService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -31,90 +37,75 @@ namespace TapForPerksAPI.Controllers.RewardOwner
             return Ok(scanEventToReturn);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ScanEventDto>> CreateScanEventForReward(ScanEventForCreationDto scanEventForCreationDto)
+        [HttpGet("{rewardId}/userbalance/{qrCodeValue}", Name = "GetUserBalanceForReward")]
+        public async Task<ActionResult<UserBalanceAndInfoResponseDto>> GetUserBalanceForReward(Guid rewardId, string qrCodeValue)
         {
-            var scanEventEntity = mapper.Map<Entities.ScanEvent>(scanEventForCreationDto);
-
             // Lookup user_id for this qrcode_value
-            var userEntity = await saveForPerksRepository.GetUserByQrCodeValueAsync(scanEventEntity.QrCodeValue);
+            var userEntity = await saveForPerksRepository.GetUserByQrCodeValueAsync(qrCodeValue);
             if (userEntity == null)
             {
                 return NotFound("User not found");
             }
 
-            scanEventEntity.UserId = userEntity.Id;
-
             // Get reward to validate it exists and to see how to create or update the user_balance
-            var rewardEntity = await saveForPerksRepository.GetRewardAsync(scanEventEntity.RewardId);
-            if(rewardEntity == null) {
+            var rewardEntity = await saveForPerksRepository.GetRewardAsync(rewardId);
+            if (rewardEntity == null)
+            {
                 return NotFound("Reward not found");
             }
 
-            // Update or create user_balance
-            var userBalanceEntity = await saveForPerksRepository.GetUserBalanceAsync(userEntity.Id, rewardEntity.Id);
-            if (userBalanceEntity == null) {
-                // Create new user_balance
-                userBalanceEntity = new Entities.UserBalance
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = userEntity.Id,
-                    RewardId = rewardEntity.Id,
-                    Balance = scanEventEntity.PointsChange,
-                    LastUpdated = DateTime.UtcNow
-                };
-
-       
-                await saveForPerksRepository.CreateUserBalance(userBalanceEntity);
-            }
-            else
+            var userBalanceAndInfo = new UserBalanceAndInfoResponseDto
             {
-                // Update existing user_balance
-                userBalanceEntity.Balance += scanEventEntity.PointsChange;
-                userBalanceEntity.LastUpdated = DateTime.UtcNow;
-            }
-
-
-
-
-            await saveForPerksRepository.CreateScanEvent(scanEventEntity);
-            await saveForPerksRepository.SaveChangesAsync();
-
-            var scanEventToReturn = mapper.Map<ScanEventDto>(scanEventEntity);
-
-            // Declare response object here - outside all if blocks
-            var scanEventResponse = new ScanEventResponseDto
-            {
-                ScanEvent = scanEventToReturn,
-                CurrentBalance = userBalanceEntity.Balance,
-                RewardAvailable = false,  // Default to false
+                QrCodeValue = qrCodeValue,
+                UserName = userEntity.Name,
+                CurrentBalance = 0,
                 AvailableReward = null,
                 TimesClaimable = 0
             };
 
+            var userPointsInfo = await saveForPerksRepository.GetUserBalanceForRewardAsync(userEntity.Id, rewardId);
+            if (userPointsInfo == null)
+            {
+                // No balance found (no scans made) for this reward by this user
+                return Ok(userBalanceAndInfo);
+            }
+            userBalanceAndInfo.CurrentBalance = userPointsInfo.Balance;
+
+ 
 
             // Check if reward is available based on reward type
             if (rewardEntity.RewardType == Entities.RewardType.IncrementalPoints)
             {
-                if (userBalanceEntity.Balance >= rewardEntity.CostPoints)
+                if (rewardEntity.CostPoints > 0 && userPointsInfo.Balance >= rewardEntity.CostPoints)
                 {
-                    int timesClaimable = userBalanceEntity.Balance / (rewardEntity.CostPoints ?? 1);
+                    int timesClaimable = userPointsInfo.Balance / rewardEntity.CostPoints;
 
-                    scanEventResponse.RewardAvailable = true;
-                    scanEventResponse.AvailableReward = new AvailableRewardDto
+                    userBalanceAndInfo.AvailableReward = new AvailableRewardDto
                     {
                         RewardId = rewardEntity.Id,
                         RewardName = rewardEntity.Name,
                         RewardType = "incremental_points",
-                        RequiredPoints = rewardEntity.CostPoints ?? 0
+                        RequiredPoints = rewardEntity.CostPoints
                     };
-                    scanEventResponse.TimesClaimable = timesClaimable;
+                    userBalanceAndInfo.TimesClaimable = timesClaimable;
                 }
             }
 
+            return Ok(userBalanceAndInfo);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ScanEventResponseDto>> CreatePointsAndClaimRewards(
+            ScanEventForCreationDto scanEventForCreationDto)
+        {
+            var result = await rewardService.ProcessScanAndRewardsAsync(scanEventForCreationDto);
+            
+            if (result.IsFailure)
+                return BadRequest(result.Error);
+
             return CreatedAtRoute("GetScanEventForReward",
-                new { rewardId = scanEventToReturn.RewardId, scanEventId = scanEventToReturn.Id },
-                scanEventResponse);
+                new { rewardId = result.Value!.ScanEvent.RewardId, scanEventId = result.Value.ScanEvent.Id },
+                result.Value);
         }
 
         [HttpGet("History")]

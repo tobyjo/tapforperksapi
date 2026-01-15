@@ -57,7 +57,7 @@ namespace TapForPerksAPI.Repositories
                 .FirstOrDefaultAsync();
         } 
 
-        public async Task<UserBalance?> GetUserBalanceAsync(Guid userId, Guid rewardId)
+        public async Task<UserBalance?> GetUserBalanceForRewardAsync(Guid userId, Guid rewardId)
         {
             return await _context.UserBalances
                 .Where(ub => ub.UserId == userId && ub.RewardId == rewardId)
@@ -73,5 +73,26 @@ namespace TapForPerksAPI.Repositories
             await _context.UserBalances.AddAsync(userBalance);
         }
 
+        public async Task<RewardRedemption?> GetRewardRedemptionAsync(Guid rewardId, Guid rewardRedemptionId)
+        {
+            return await _context.RewardRedemptions
+                .Where(rr => rr.RewardId == rewardId && rr.Id == rewardRedemptionId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateUserBalance(UserBalance userBalance)
+        {
+            // No implementation needed for EF Core as it tracks changes automatically
+            await Task.CompletedTask;
+        }
+
+        public async Task CreateRewardRedemption(RewardRedemption rewardRedemption)
+        {
+            if (rewardRedemption == null)
+            {
+                throw new ArgumentNullException(nameof(rewardRedemption));
+            }
+            await _context.RewardRedemptions.AddAsync(rewardRedemption);
+        }
     }
 }

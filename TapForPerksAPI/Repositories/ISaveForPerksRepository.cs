@@ -17,9 +17,15 @@ namespace TapForPerksAPI.Repositories
 
         Task<Reward?> GetRewardAsync(Guid rewardId);
 
-        Task<UserBalance?> GetUserBalanceAsync(Guid userId,  Guid rewardId);
+        Task<UserBalance?> GetUserBalanceForRewardAsync(Guid userId,  Guid rewardId);
 
         Task CreateUserBalance(UserBalance userBalance);
+
+        Task<RewardRedemption?> GetRewardRedemptionAsync(Guid rewardId, Guid rewardRedemptionId);
+
+        Task UpdateUserBalance(UserBalance userBalance);
+
+        Task CreateRewardRedemption(RewardRedemption rewardRedemption);
 
     }
 }

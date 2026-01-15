@@ -12,7 +12,7 @@ using TapForPerksAPI.DbContexts;
 namespace TapForPerksAPI.Migrations
 {
     [DbContext(typeof(TapForPerksContext))]
-    [Migration("20260113142515_InitalCreate")]
+    [Migration("20260113162232_InitalCreate")]
     partial class InitalCreate
     {
         /// <inheritdoc />
@@ -33,7 +33,7 @@ namespace TapForPerksAPI.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<int?>("CostPoints")
+                    b.Property<int>("CostPoints")
                         .HasColumnType("int")
                         .HasColumnName("cost_points");
 

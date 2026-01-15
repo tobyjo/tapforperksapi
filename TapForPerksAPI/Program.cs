@@ -7,16 +7,18 @@ using TapForPerksAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Kestrel to listen on both HTTP and HTTPS
-/*
+
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenLocalhost(5040); // HTTP
+    options.ListenLocalhost(5143); // HTTP
+    /*
     options.ListenLocalhost(7040, listenOptions =>
     {
         listenOptions.UseHttps(); // HTTPS
     });
+    */
 });
-*/
+
 
 // Add services to the container.
 builder.Services.AddDbContext<TapForPerksContext>(options =>
@@ -24,6 +26,7 @@ builder.Services.AddDbContext<TapForPerksContext>(options =>
 
 builder.Services.AddScoped<ISaveForPerksRepository, SaveForPerksRepository>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
+builder.Services.AddScoped<IRewardService, RewardService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

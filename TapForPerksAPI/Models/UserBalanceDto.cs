@@ -1,4 +1,4 @@
-namespace TapForPerksAPI.Models
+﻿namespace TapForPerksAPI.Models
 {
     public class UserBalanceDto
     {
@@ -6,6 +6,7 @@ namespace TapForPerksAPI.Models
         public Guid UserId { get; set; }
         public Guid RewardId { get; set; }
         public int Balance { get; set; }
+
         public DateTime LastUpdated { get; set; }
     }
 }

@@ -3,6 +3,7 @@ namespace TapForPerksAPI.Models;
 public class ScanEventResponseDto
 {
     public ScanEventDto ScanEvent { get; set; } = null!;
+    public string UserName { get; set; } = null!;
     public int CurrentBalance { get; set; }
     public bool RewardAvailable { get; set; }
     public AvailableRewardDto? AvailableReward { get; set; }  // Single reward instead of list
