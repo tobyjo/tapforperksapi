@@ -1,5 +1,6 @@
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using TapForPerksAPI.Common;
 using TapForPerksAPI.Entities;
@@ -14,13 +15,15 @@ public class RewardServiceTests
 {
     private readonly Mock<ISaveForPerksRepository> _mockRepository;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ILogger<RewardService>> _mockLogger;
     private readonly RewardService _service;
 
     public RewardServiceTests()
     {
         _mockRepository = new Mock<ISaveForPerksRepository>();
         _mockMapper = new Mock<IMapper>();
-        _service = new RewardService(_mockRepository.Object, _mockMapper.Object);
+        _mockLogger = new Mock<ILogger<RewardService>>();
+        _service = new RewardService(_mockRepository.Object, _mockMapper.Object, _mockLogger.Object);
     }
 
     #region GetScanEventForRewardAsync Tests
@@ -77,7 +80,7 @@ public class RewardServiceTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Scan event not found");
+        result.Error.Should().Be("Scan event not found");  // Generic message
     }
 
     #endregion
@@ -122,7 +125,7 @@ public class RewardServiceTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("User not found");
+        result.Error.Should().Be("Invalid QR code or reward");  // Generic message
     }
 
     [Fact]

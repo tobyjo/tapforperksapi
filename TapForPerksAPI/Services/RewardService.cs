@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using TapForPerksAPI.Common;
 using TapForPerksAPI.Entities;
 using TapForPerksAPI.Models;
@@ -10,11 +11,16 @@ public class RewardService : IRewardService
 {
     private readonly ISaveForPerksRepository _repository;
     private readonly IMapper _mapper;
+    private readonly ILogger<RewardService> _logger;
 
-    public RewardService(ISaveForPerksRepository repository, IMapper mapper)
+    public RewardService(
+        ISaveForPerksRepository repository, 
+        IMapper mapper,
+        ILogger<RewardService> logger)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<Result<ScanEventResponseDto>> ProcessScanAndRewardsAsync(
@@ -46,12 +52,24 @@ public class RewardService : IRewardService
         // Validate user exists
         var user = await _repository.GetUserByQrCodeValueAsync(request.QrCodeValue);
         if (user == null)
-            return Result<(User, Reward, UserBalance?)>.Failure("User not found");
+        {
+            _logger.LogWarning(
+                "User not found. QrCode: {QrCode}, RewardId: {RewardId}", 
+                request.QrCodeValue, request.RewardId);
+            return Result<(User, Reward, UserBalance?)>.Failure(
+                "Invalid QR code or reward");  // Generic - don't reveal which one failed
+        }
 
         // Validate reward exists
         var reward = await _repository.GetRewardAsync(request.RewardId);
         if (reward == null)
-            return Result<(User, Reward, UserBalance?)>.Failure("Reward not found");
+        {
+            _logger.LogWarning(
+                "Reward not found. RewardId: {RewardId}, UserId: {UserId}, QrCode: {QrCode}", 
+                request.RewardId, user.Id, request.QrCodeValue);
+            return Result<(User, Reward, UserBalance?)>.Failure(
+                "Invalid QR code or reward");  // Generic - don't reveal which one failed
+        }
 
         // Get existing balance
         var balance = await _repository.GetUserBalanceForRewardAsync(user.Id, reward.Id);
@@ -60,19 +78,34 @@ public class RewardService : IRewardService
         if (request.NumRewardsToClaim > 0)
         {
             if (request.NumRewardsToClaim < 0 || request.NumRewardsToClaim > 100)
+            {
+                _logger.LogWarning(
+                    "Invalid claim count. User: {UserId} ({UserName}), Requested: {Count}", 
+                    user.Id, user.Name, request.NumRewardsToClaim);
                 return Result<(User, Reward, UserBalance?)>.Failure(
-                    "Number of rewards to claim must be between 0 and 100");
+                    "Number of rewards to claim must be between 0 and 100");  // OK - validation error
+            }
 
             if (balance == null)
+            {
+                _logger.LogInformation(
+                    "No balance for claim attempt. UserId: {UserId} ({UserName}), RewardId: {RewardId} ({RewardName})", 
+                    user.Id, user.Name, reward.Id, reward.Name);
                 return Result<(User, Reward, UserBalance?)>.Failure(
-                    "Cannot claim rewards - no points balance exists");
+                    "You don't have any points for this reward yet");  // User-friendly, not revealing IDs
+            }
 
             var currentBalance = balance.Balance;
             var requiredPoints = reward.CostPoints * request.NumRewardsToClaim;
             
             if (currentBalance < requiredPoints)
+            {
+                _logger.LogInformation(
+                    "Insufficient points. User: {UserId} ({UserName}), Required: {Required}, Available: {Available}, Reward: {RewardName}", 
+                    user.Id, user.Name, requiredPoints, currentBalance, reward.Name);
                 return Result<(User, Reward, UserBalance?)>.Failure(
-                    $"Insufficient points. Required: {requiredPoints}, Available: {currentBalance}");
+                    $"Insufficient points. Required: {requiredPoints}, Available: {currentBalance}");  // OK - user's own data
+            }
         }
 
         return Result<(User, Reward, UserBalance?)>.Success((user, reward, balance));
@@ -95,10 +128,16 @@ public class RewardService : IRewardService
             if (request.NumRewardsToClaim > 0)
             {
                 redemptionIds = await ClaimRewardsAsync(user, reward, balance, request.NumRewardsToClaim);
+                _logger.LogInformation(
+                    "Rewards claimed. User: {UserId} ({UserName}), Reward: {RewardName}, Count: {Count}, PointsDeducted: {Points}", 
+                    user.Id, user.Name, reward.Name, request.NumRewardsToClaim, reward.CostPoints * request.NumRewardsToClaim);
             }
 
             // 3. Create scan event
             var scanEvent = await CreateScanEventAsync(user, reward, request);
+            _logger.LogInformation(
+                "Scan event created. ScanEventId: {ScanEventId}, User: {UserId}, Reward: {RewardId}, Points: +{Points}", 
+                scanEvent.Id, user.Id, reward.Id, request.PointsChange);
 
             // 4. Save all changes
             await _repository.SaveChangesAsync();
@@ -107,7 +146,11 @@ public class RewardService : IRewardService
         }
         catch (Exception ex)
         {
-            return Result<(UserBalance, ScanEvent, List<Guid>?)>.Failure($"Transaction failed: {ex.Message}");
+            _logger.LogError(ex, 
+                "Transaction failed. User: {UserId}, Reward: {RewardId}, Error: {Error}", 
+                user.Id, reward.Id, ex.Message);
+            return Result<(UserBalance, ScanEvent, List<Guid>?)>.Failure(
+                "An error occurred while processing your request");  // Generic for user
         }
     }
 
@@ -254,11 +297,23 @@ public class RewardService : IRewardService
     {
         var user = await _repository.GetUserByQrCodeValueAsync(qrCodeValue);
         if (user == null)
-            return Result<(User, Reward)>.Failure("User not found");
+        {
+            _logger.LogWarning(
+                "User balance check: User not found. QrCode: {QrCode}, RewardId: {RewardId}", 
+                qrCodeValue, rewardId);
+            return Result<(User, Reward)>.Failure(
+                "Invalid QR code or reward");  // Generic
+        }
 
         var reward = await _repository.GetRewardAsync(rewardId);
         if (reward == null)
-            return Result<(User, Reward)>.Failure("Reward not found");
+        {
+            _logger.LogWarning(
+                "User balance check: Reward not found. RewardId: {RewardId}, UserId: {UserId}, QrCode: {QrCode}", 
+                rewardId, user.Id, qrCodeValue);
+            return Result<(User, Reward)>.Failure(
+                "Invalid QR code or reward");  // Generic
+        }
 
         return Result<(User, Reward)>.Success((user, reward));
     }
@@ -307,7 +362,13 @@ public class RewardService : IRewardService
         var scanEvent = await _repository.GetScanEventAsync(rewardId, scanEventId);
         
         if (scanEvent == null)
-            return Result<ScanEventDto>.Failure("Scan event not found");
+        {
+            _logger.LogWarning(
+                "Scan event not found. ScanEventId: {ScanEventId}, RewardId: {RewardId}", 
+                scanEventId, rewardId);
+            return Result<ScanEventDto>.Failure(
+                "Scan event not found");  // Generic - don't reveal IDs
+        }
 
         var scanEventDto = _mapper.Map<ScanEventDto>(scanEvent);
         return Result<ScanEventDto>.Success(scanEventDto);

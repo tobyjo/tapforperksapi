@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using TapForPerksAPI.Common;
 using TapForPerksAPI.Controllers.RewardOwner;
@@ -12,12 +13,14 @@ namespace TapForPerksAPI.Tests.Controllers;
 public class RewardOwnerScanControllerTests
 {
     private readonly Mock<IRewardService> _mockRewardService;
+    private readonly Mock<ILogger<RewardOwnerScanController>> _mockLogger;
     private readonly RewardOwnerScanController _controller;
 
     public RewardOwnerScanControllerTests()
     {
         _mockRewardService = new Mock<IRewardService>();
-        _controller = new RewardOwnerScanController(_mockRewardService.Object);
+        _mockLogger = new Mock<ILogger<RewardOwnerScanController>>();
+        _controller = new RewardOwnerScanController(_mockRewardService.Object, _mockLogger.Object);
     }
 
     #region GetScanEventForReward Tests
@@ -272,9 +275,19 @@ public class RewardOwnerScanControllerTests
     {
         // Act & Assert
         var exception = Assert.Throws<ArgumentNullException>(() => 
-            new RewardOwnerScanController(null!));
+            new RewardOwnerScanController(null!, _mockLogger.Object));
         
         exception.ParamName.Should().Be("rewardService");
+    }
+
+    [Fact]
+    public void Constructor_WithNullLogger_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentNullException>(() => 
+            new RewardOwnerScanController(_mockRewardService.Object, null!));
+        
+        exception.ParamName.Should().Be("logger");
     }
 
     #endregion

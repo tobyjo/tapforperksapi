@@ -9,19 +9,24 @@ namespace TapForPerksAPI.Controllers.RewardOwner
     public class RewardOwnerScanController : ControllerBase
     {
         private readonly IRewardService rewardService;
+        private readonly ILogger<RewardOwnerScanController> logger;
 
-        public RewardOwnerScanController(IRewardService rewardService)
+        public RewardOwnerScanController(IRewardService rewardService, ILogger<RewardOwnerScanController> logger)
         {
             this.rewardService = rewardService ?? throw new ArgumentNullException(nameof(rewardService));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet("{rewardId}/events/{scanEventId}", Name = "GetScanEventForReward")]
         public async Task<ActionResult<ScanEventDto>> GetScanEventForReward(Guid rewardId, Guid scanEventId)
         {
             var result = await rewardService.GetScanEventForRewardAsync(rewardId, scanEventId);
-            
+
             if (result.IsFailure)
+            {
+                logger.LogWarning("Scan event not found: {Error}", result.Error);
                 return NotFound(result.Error);
+            }
 
             return Ok(result.Value);
         }
@@ -32,9 +37,12 @@ namespace TapForPerksAPI.Controllers.RewardOwner
             string qrCodeValue)
         {
             var result = await rewardService.GetUserBalanceForRewardAsync(rewardId, qrCodeValue);
-            
+
             if (result.IsFailure)
+            {
+                logger.LogWarning("User balance not found: {Error}", result.Error);
                 return NotFound(result.Error);
+            }
 
             return Ok(result.Value);
         }
@@ -46,7 +54,11 @@ namespace TapForPerksAPI.Controllers.RewardOwner
             var result = await rewardService.ProcessScanAndRewardsAsync(scanEventForCreationDto);
             
             if (result.IsFailure)
+            {
+                logger.LogWarning("Failed to process scan event: {Error}", result.Error);
                 return BadRequest(result.Error);
+            }
+                
 
             return CreatedAtRoute("GetScanEventForReward",
                 new { rewardId = result.Value!.ScanEvent.RewardId, scanEventId = result.Value.ScanEvent.Id },
