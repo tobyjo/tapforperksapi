@@ -5,6 +5,10 @@ obj/
 [Ll]og/
 *.log
 
+## Serilog log files
+logs/
+*.txt
+
 ## User-specific files
 *.suo
 *.user

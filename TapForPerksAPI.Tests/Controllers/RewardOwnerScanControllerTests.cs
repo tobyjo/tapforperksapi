@@ -10,6 +10,11 @@ using Xunit;
 
 namespace TapForPerksAPI.Tests.Controllers;
 
+/// <summary>
+/// Unit tests for RewardOwnerScanController.
+/// These tests mock the service layer to test controller routing and HTTP response handling.
+/// For testing actual business logic, see Integration/Services/RewardServiceIntegrationTests.cs
+/// </summary>
 public class RewardOwnerScanControllerTests
 {
     private readonly Mock<IRewardService> _mockRewardService;
