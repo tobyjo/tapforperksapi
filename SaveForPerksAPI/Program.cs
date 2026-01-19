@@ -39,21 +39,17 @@ try
     // Use Serilog for all logging
     builder.Host.UseSerilog();
 
-    // Configure Kestrel ONLY for local development
-    if (builder.Environment.IsDevelopment())
+    // Configure Kestrel to listen on both HTTP and HTTPS
+    builder.WebHost.ConfigureKestrel(options =>
     {
-        builder.WebHost.ConfigureKestrel(options =>
+        options.ListenLocalhost(5143); // HTTP
+        /*
+        options.ListenLocalhost(7040, listenOptions =>
         {
-            options.ListenLocalhost(5143); // HTTP
-            /*
-            options.ListenLocalhost(7040, listenOptions =>
-            {
-                listenOptions.UseHttps(); // HTTPS
-            });
-            */
+            listenOptions.UseHttps(); // HTTPS
         });
-    }
-    // In Azure App Service, let the default configuration handle port binding
+        */
+    });
 
     // Configure Azure Key Vault integration
     var keyVaultName = builder.Configuration["Azure:KeyVaultName"];
