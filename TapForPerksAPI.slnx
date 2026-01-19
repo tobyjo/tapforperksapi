@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="TapForPerksAPI.Tests/TapForPerksAPI.Tests.csproj" />
-  <Project Path="TapForPerksAPI/TapForPerksAPI.csproj" />
-</Solution>

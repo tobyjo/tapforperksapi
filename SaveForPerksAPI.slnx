@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SaveForPerksAPI.Tests/SaveForPerksAPI.Tests.csproj" />
+  <Project Path="SaveForPerksAPI/SaveForPerksAPI.csproj" />
+</Solution>
