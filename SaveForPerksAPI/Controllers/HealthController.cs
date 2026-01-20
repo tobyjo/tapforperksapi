@@ -17,11 +17,14 @@ public class HealthController : BaseApiController
     public IActionResult Get()
     {
         var keyVaultName = _configuration["Azure:KeyVaultName"];
-        var connectionString = _configuration.GetConnectionString("DefaultConnection");
+        var connectionString = _configuration.GetConnectionString("SaveForPerksDBConnectionString");
         
         // Mask the connection string for security (show only if it exists and first/last few chars)
         var maskedConnectionString = connectionString != null 
             ? $"{connectionString[..Math.Min(20, connectionString.Length)]}...{(connectionString.Length > 40 ? connectionString[^10..] : "")}" 
+            : "NOT CONFIGURED";
+        var nonMaskedConnectionString = connectionString != null
+            ? $"{connectionString}"
             : "NOT CONFIGURED";
 
         Logger.LogInformation("Health check accessed");
@@ -33,7 +36,8 @@ public class HealthController : BaseApiController
             environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown",
             keyVault = keyVaultName ?? "NOT CONFIGURED",
             connectionStringConfigured = connectionString != null,
-            connectionStringPreview = maskedConnectionString,
+            // connectionStringPreview = maskedConnectionString,
+            connectionStringPreview = nonMaskedConnectionString,
             machineName = Environment.MachineName
         });
     }

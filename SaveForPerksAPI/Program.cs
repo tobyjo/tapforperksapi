@@ -80,7 +80,7 @@ try
 
     // Add services to the container.
     builder.Services.AddDbContext<TapForPerksContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SaveForPerksDBConnectionString")));
 
 builder.Services.AddScoped<ISaveForPerksRepository, SaveForPerksRepository>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
