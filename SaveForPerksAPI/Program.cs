@@ -84,7 +84,19 @@ try
 
     // Add services to the container.
     builder.Services.AddDbContext<TapForPerksContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SaveForPerksDBConnectionString")));
+        options.UseSqlServer(
+            builder.Configuration.GetConnectionString("SaveForPerksDBConnectionString"),
+            sqlServerOptionsAction: sqlOptions =>
+            {
+                // Enable automatic retry on transient failures (connection resets, timeouts, etc.)
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            
+                // Set command timeout (optional, default is 30 seconds)
+                sqlOptions.CommandTimeout(60);
+            }));
 
 builder.Services.AddScoped<ISaveForPerksRepository, SaveForPerksRepository>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
