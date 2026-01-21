@@ -18,7 +18,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
     .Enrich.FromLogContext()
-    .Enrich.WithProperty("Application", "TapForPerksAPI")
+    .Enrich.WithProperty("Application", "SaveForPerksAPI")
     .Enrich.WithMachineName()
     .Enrich.WithEnvironmentName()
     .WriteTo.Console(
@@ -32,7 +32,11 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("Starting TapForPerksAPI");
+    var startTime = DateTime.UtcNow;
+    Log.Information("========================================");
+    Log.Information("APPLICATION STARTUP - SaveForPerksAPI");
+    Log.Information("Startup Time (UTC): {StartupTime}", startTime);
+    Log.Information("========================================");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -165,7 +169,7 @@ else
 
     app.MapControllers();
 
-    Log.Information("TapForPerksAPI started successfully on {Environment}", app.Environment.EnvironmentName);
+    Log.Information("SaveForPerksAPI started successfully on {Environment}", app.Environment.EnvironmentName);
     
     app.Run();
 }
@@ -176,6 +180,6 @@ catch (Exception ex)
 }
 finally
 {
-    Log.Information("Shutting down TapForPerksAPI");
+    Log.Information("Shutting down SaveForPerksAPI");
     Log.CloseAndFlush();
 }
