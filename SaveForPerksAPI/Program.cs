@@ -101,6 +101,7 @@ try
 builder.Services.AddScoped<ISaveForPerksRepository, SaveForPerksRepository>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
 builder.Services.AddScoped<IRewardService, RewardService>();
+builder.Services.AddScoped<IRewardOwnerUserService, RewardOwnerUserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

@@ -23,12 +23,153 @@ public class RewardService : IRewardService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<Result<RewardOwnerWithAdminUserForCreationDto>> CreateRewardOwnerAsync(
+    public async Task<Result<RewardOwnerWithAdminUserResponseDto>> CreateRewardOwnerAsync(
         RewardOwnerWithAdminUserForCreationDto request)
     {
-        // Implementation for creating reward owner with admin user
-        // This is a placeholder as the original request did not include this method's implementation
-        throw new NotImplementedException();
+        // 1. Validate request
+        var validationResult = ValidateCreateRewardOwnerRequest(request);
+        if (validationResult.IsFailure)
+            return Result<RewardOwnerWithAdminUserResponseDto>.Failure(validationResult.Error!);
+
+        // 2. Check for duplicate email
+        var duplicateCheckResult = await CheckDuplicateEmailAsync(request.RewardOwnerUserEmail);
+        if (duplicateCheckResult.IsFailure)
+            return Result<RewardOwnerWithAdminUserResponseDto>.Failure(duplicateCheckResult.Error!);
+
+        // 3. Create entities in transaction
+        var createResult = await CreateRewardOwnerAndUserAsync(request);
+        if (createResult.IsFailure)
+            return Result<RewardOwnerWithAdminUserResponseDto>.Failure(createResult.Error!);
+
+        var (rewardOwner, rewardOwnerUser) = createResult.Value;
+
+        // 4. Build response
+        var response = BuildCreateRewardOwnerResponse(rewardOwner, rewardOwnerUser);
+
+        _logger.LogInformation(
+            "Reward owner and admin user created successfully. RewardOwnerId: {RewardOwnerId}, RewardOwnerUserId: {UserId}, Email: {Email}",
+            rewardOwner.Id, rewardOwnerUser.Id, rewardOwnerUser.Email);
+
+        return Result<RewardOwnerWithAdminUserResponseDto>.Success(response);
+    }
+
+    private Result<bool> ValidateCreateRewardOwnerRequest(RewardOwnerWithAdminUserForCreationDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.RewardOwnerName))
+        {
+            _logger.LogWarning("Validation failed: RewardOwnerName is required");
+            return Result<bool>.Failure("Reward owner name is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.RewardOwnerUserAuthProviderId))
+        {
+            _logger.LogWarning("Validation failed: Auth provider ID is required");
+            return Result<bool>.Failure("Authentication provider ID is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.RewardOwnerUserEmail))
+        {
+            _logger.LogWarning("Validation failed: Email is required");
+            return Result<bool>.Failure("Email is required");
+        }
+
+        // Basic email validation
+        if (!request.RewardOwnerUserEmail.Contains('@') || !request.RewardOwnerUserEmail.Contains('.'))
+        {
+            _logger.LogWarning("Validation failed: Invalid email format. Email: {Email}", request.RewardOwnerUserEmail);
+            return Result<bool>.Failure("Invalid email format");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.RewardOwnerUserName))
+        {
+            _logger.LogWarning("Validation failed: User name is required");
+            return Result<bool>.Failure("User name is required");
+        }
+
+        return Result<bool>.Success(true);
+    }
+
+    private async Task<Result<bool>> CheckDuplicateEmailAsync(string email)
+    {
+        var existingUser = await _repository.GetRewardOwnerUserByEmailAsync(email);
+        if (existingUser != null)
+        {
+            _logger.LogWarning(
+                "Duplicate email detected during reward owner creation. Email: {Email}", 
+                email);
+            return Result<bool>.Failure("A user with this email already exists");
+        }
+
+        return Result<bool>.Success(true);
+    }
+
+    private async Task<Result<(RewardOwner rewardOwner, RewardOwnerUser rewardOwnerUser)>> 
+        CreateRewardOwnerAndUserAsync(RewardOwnerWithAdminUserForCreationDto request)
+    {
+        try
+        {
+            // Create RewardOwner
+            var rewardOwnerId = Guid.NewGuid();
+            var rewardOwner = new RewardOwner
+            {
+                Id = rewardOwnerId,
+                Name = request.RewardOwnerName,
+                Description = request.RewardOwnerDescription,
+                Address = null, // Can be added later if needed
+                CreatedAt = DateTime.UtcNow
+            };
+            await _repository.CreateRewardOwnerAsync(rewardOwner);
+
+            _logger.LogInformation(
+                "RewardOwner entity created. RewardOwnerId: {RewardOwnerId}, Name: {Name}",
+                rewardOwnerId, rewardOwner.Name);
+
+            // Create RewardOwnerUser (admin)
+            var rewardOwnerUserId = Guid.NewGuid();
+            var rewardOwnerUser = new RewardOwnerUser
+            {
+                Id = rewardOwnerUserId,
+                RewardOwnerId = rewardOwnerId,
+                AuthProviderId = request.RewardOwnerUserAuthProviderId,
+                Email = request.RewardOwnerUserEmail,
+                Name = request.RewardOwnerUserName,
+                IsAdmin = true, // Always admin for this creation flow
+                CreatedAt = DateTime.UtcNow
+            };
+            await _repository.CreateRewardOwnerUserAsync(rewardOwnerUser);
+
+            _logger.LogInformation(
+                "RewardOwnerUser entity created. UserId: {UserId}, Email: {Email}, IsAdmin: true, RewardOwnerId: {RewardOwnerId}",
+                rewardOwnerUserId, rewardOwnerUser.Email, rewardOwnerId);
+
+            // Save changes (atomic transaction)
+            await _repository.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Transaction committed successfully. RewardOwnerId: {RewardOwnerId}, UserId: {UserId}",
+                rewardOwnerId, rewardOwnerUserId);
+
+            return Result<(RewardOwner, RewardOwnerUser)>.Success((rewardOwner, rewardOwnerUser));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to create reward owner and admin user. RewardOwnerName: {Name}, Email: {Email}, Error: {Error}",
+                request.RewardOwnerName, request.RewardOwnerUserEmail, ex.Message);
+            return Result<(RewardOwner, RewardOwnerUser)>.Failure(
+                "An error occurred while creating the reward owner account");
+        }
+    }
+
+    private RewardOwnerWithAdminUserResponseDto BuildCreateRewardOwnerResponse(
+        RewardOwner rewardOwner,
+        RewardOwnerUser rewardOwnerUser)
+    {
+        return new RewardOwnerWithAdminUserResponseDto
+        {
+            RewardOwner = _mapper.Map<RewardOwnerDto>(rewardOwner),
+            RewardOwnerUser = _mapper.Map<RewardOwnerUserDto>(rewardOwnerUser)
+        };
     }
 
     public async Task<Result<ScanEventResponseDto>> ProcessScanAndRewardsAsync(

@@ -94,5 +94,44 @@ namespace SaveForPerksAPI.Repositories
             }
             await _context.RewardRedemptions.AddAsync(rewardRedemption);
         }
+
+        public async Task<RewardOwnerUser?> GetRewardOwnerUserByEmailAsync(string email)
+        {
+            return await _context.RewardOwnerUsers
+                .Where(rou => rou.Email == email)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task CreateRewardOwnerAsync(RewardOwner rewardOwner)
+        {
+            if (rewardOwner == null)
+            {
+                throw new ArgumentNullException(nameof(rewardOwner));
+            }
+            await _context.RewardOwners.AddAsync(rewardOwner);
+        }
+
+        public async Task CreateRewardOwnerUserAsync(RewardOwnerUser rewardOwnerUser)
+        {
+            if (rewardOwnerUser == null)
+            {
+                throw new ArgumentNullException(nameof(rewardOwnerUser));
+            }
+            await _context.RewardOwnerUsers.AddAsync(rewardOwnerUser);
+        }
+
+        public async Task<RewardOwnerUser?> GetRewardOwnerUserByAuthProviderIdAsync(string authProviderId)
+        {
+            return await _context.RewardOwnerUsers
+                .Where(rou => rou.AuthProviderId == authProviderId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<RewardOwner?> GetRewardOwnerByIdAsync(Guid rewardOwnerId)
+        {
+            return await _context.RewardOwners
+                .Where(ro => ro.Id == rewardOwnerId)
+                .FirstOrDefaultAsync();
+        }
     }
 }

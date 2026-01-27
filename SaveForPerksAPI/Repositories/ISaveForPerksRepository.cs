@@ -27,5 +27,15 @@ namespace SaveForPerksAPI.Repositories
 
         Task CreateRewardRedemption(RewardRedemption rewardRedemption);
 
+        Task<RewardOwnerUser?> GetRewardOwnerUserByEmailAsync(string email);
+
+        Task CreateRewardOwnerAsync(RewardOwner rewardOwner);
+
+        Task CreateRewardOwnerUserAsync(RewardOwnerUser rewardOwnerUser);
+
+        Task<RewardOwnerUser?> GetRewardOwnerUserByAuthProviderIdAsync(string authProviderId);
+
+        Task<RewardOwner?> GetRewardOwnerByIdAsync(Guid rewardOwnerId);
+
     }
 }

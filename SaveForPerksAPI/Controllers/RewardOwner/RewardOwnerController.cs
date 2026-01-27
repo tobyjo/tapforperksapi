@@ -4,6 +4,7 @@ using SaveForPerksAPI.Services;
 
 namespace SaveForPerksAPI.Controllers.RewardOwner
 {
+    [Route("api/reward-owner")]
     public class RewardOwnerController : BaseApiController
     {
         private readonly IRewardService rewardService;
@@ -17,14 +18,18 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
         }
 
         [HttpPost]
-        public async Task<ActionResult<RewardOwnerWithAdminUserForCreationDto>> CreateRewardOwnerWithAdminUser(
+        public async Task<ActionResult<RewardOwnerWithAdminUserResponseDto>> CreateRewardOwnerWithAdminUser(
             RewardOwnerWithAdminUserForCreationDto rewardOwnerWithAdminUserForCreationDto)
         {
-            Logger.LogInformation("CreateRewardOwner called with RewardOwnerName: {RewardOwnerName}, RewardOwnerUserAuthProviderId: {RewardOwnerUserAuthProviderId}",
-                rewardOwnerWithAdminUserForCreationDto.RewardOwnerName, rewardOwnerWithAdminUserForCreationDto.RewardOwnerUserAuthProviderId);
-     
-       
+            Logger.LogInformation(
+                "CreateRewardOwner called with RewardOwnerName: {RewardOwnerName}, Email: {Email}, AuthProviderId: {AuthProviderId}",
+                rewardOwnerWithAdminUserForCreationDto.RewardOwnerName, 
+                rewardOwnerWithAdminUserForCreationDto.RewardOwnerUserEmail,
+                rewardOwnerWithAdminUserForCreationDto.RewardOwnerUserAuthProviderId);
 
+            return await ExecuteAsync(
+                () => rewardService.CreateRewardOwnerAsync(rewardOwnerWithAdminUserForCreationDto),
+                nameof(CreateRewardOwnerWithAdminUser));
         }
 
     }
