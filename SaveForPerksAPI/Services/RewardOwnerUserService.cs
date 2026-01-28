@@ -61,6 +61,37 @@ public class RewardOwnerUserService : IRewardOwnerUserService
             "RewardOwner found for authProviderId: {AuthProviderId}, RewardOwnerId: {RewardOwnerId}, RewardOwnerName: {Name}",
             authProviderId, rewardOwner.Id, rewardOwner.Name);
 
+
         return Result<IEnumerable<RewardOwnerDto>>.Success(new List<RewardOwnerDto> { rewardOwnerDto });
+    }
+
+    public async Task<Result<RewardOwnerUserDto>> GetRewardOwnerUserByAuthProviderIdAsync(string authProviderId)
+    {
+        // 1. Validate input
+        if (string.IsNullOrWhiteSpace(authProviderId))
+        {
+            _logger.LogWarning("GetRewardOwnerUserByAuthProviderId called with empty authProviderId");
+            return Result<RewardOwnerUserDto>.Failure("Auth provider ID is required");
+        }
+
+        // 2. Get RewardOwnerUser by authProviderId
+        var rewardOwnerUser = await _repository.GetRewardOwnerUserByAuthProviderIdAsync(authProviderId);
+        
+        if (rewardOwnerUser == null)
+        {
+            _logger.LogInformation(
+                "RewardOwnerUser not found for authProviderId: {AuthProviderId}", 
+                authProviderId);
+            return Result<RewardOwnerUserDto>.Failure("User not found");
+        }
+
+        // 3. Map and return
+        var rewardOwnerUserDto = _mapper.Map<RewardOwnerUserDto>(rewardOwnerUser);
+        
+        _logger.LogInformation(
+            "RewardOwnerUser found for authProviderId: {AuthProviderId}, UserId: {UserId}, Email: {Email}",
+            authProviderId, rewardOwnerUser.Id, rewardOwnerUser.Email);
+
+        return Result<RewardOwnerUserDto>.Success(rewardOwnerUserDto);
     }
 }

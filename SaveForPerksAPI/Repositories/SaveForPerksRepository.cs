@@ -127,6 +127,13 @@ namespace SaveForPerksAPI.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<RewardOwnerUser?> GetRewardOwnerUserByIdAsync(Guid rewardOwnerUserId)
+        {
+            return await _context.RewardOwnerUsers
+                .Where(rou => rou.Id == rewardOwnerUserId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<RewardOwner?> GetRewardOwnerByIdAsync(Guid rewardOwnerId)
         {
             return await _context.RewardOwners

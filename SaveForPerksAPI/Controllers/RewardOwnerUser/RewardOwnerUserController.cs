@@ -30,6 +30,18 @@ namespace SaveForPerksAPI.Controllers.RewardOwnerUser
                 nameof(GetRewardOwnersByAuthProviderId));
         }
 
+        [HttpGet("by-auth/{authProviderId}")]
+        public async Task<ActionResult<RewardOwnerUserDto>> GetRewardOwnerUserByAuthProviderId(string authProviderId)
+        {
+            Logger.LogInformation(
+                "GetRewardOwnerUserByAuthProviderId called with AuthProviderId: {AuthProviderId}",
+                authProviderId);
+
+            return await ExecuteAsync(
+                () => _rewardOwnerUserService.GetRewardOwnerUserByAuthProviderIdAsync(authProviderId),
+                nameof(GetRewardOwnerUserByAuthProviderId));
+        }
+
 
     }
 }
