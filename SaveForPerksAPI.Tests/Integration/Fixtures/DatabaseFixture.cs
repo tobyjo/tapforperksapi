@@ -22,8 +22,8 @@ public class DatabaseFixture : IDisposable
     public TapForPerksContext Context { get; private set; }
     public ISaveForPerksRepository Repository { get; private set; }
     public IMapper Mapper { get; private set; }
-    public ILogger<RewardService> Logger { get; private set; }
-    public RewardService Service { get; private set; }
+    public ILogger<RewardTransactionService> Logger { get; private set; }
+    public RewardTransactionService Service { get; private set; }
 
     public DatabaseFixture()
     {
@@ -74,10 +74,10 @@ public class DatabaseFixture : IDisposable
         // Create logger (minimal output for tests)
         var loggerFactory = LoggerFactory.Create(builder => 
             builder.AddConsole().SetMinimumLevel(LogLevel.Warning));
-        Logger = loggerFactory.CreateLogger<RewardService>();
+        Logger = loggerFactory.CreateLogger<RewardTransactionService>();
 
         // Create real service with in-memory dependencies
-        Service = new RewardService(Repository, Mapper, Logger);
+        Service = new RewardTransactionService(Repository, Mapper, Logger);
     }
 
     public void Dispose()

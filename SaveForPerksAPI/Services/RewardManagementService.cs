@@ -1,0 +1,173 @@
+using AutoMapper;
+using SaveForPerksAPI.Common;
+using SaveForPerksAPI.Entities;
+using SaveForPerksAPI.Models;
+using SaveForPerksAPI.Repositories;
+
+namespace SaveForPerksAPI.Services;
+
+public class RewardManagementService : IRewardManagementService
+{
+    private readonly ISaveForPerksRepository _repository;
+    private readonly IMapper _mapper;
+    private readonly ILogger<RewardManagementService> _logger;
+
+    public RewardManagementService(
+        ISaveForPerksRepository repository,
+        IMapper mapper,
+        ILogger<RewardManagementService> logger)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    public async Task<Result<RewardDto>> CreateRewardAsync(RewardForCreationDto request)
+    {
+        // 1. Validate request
+        var validationResult = ValidateCreateRewardRequest(request);
+        if (validationResult.IsFailure)
+            return Result<RewardDto>.Failure(validationResult.Error!);
+
+        // 2. Verify RewardOwner exists
+        var rewardOwnerCheck = await VerifyRewardOwnerExistsAsync(request.RewardOwnerId);
+        if (rewardOwnerCheck.IsFailure)
+            return Result<RewardDto>.Failure(rewardOwnerCheck.Error!);
+
+        // 3. Check for existing reward for this RewardOwner
+        var existingRewardCheck = await CheckForExistingRewardAsync(request.RewardOwnerId);
+        if (existingRewardCheck.IsFailure)
+            return Result<RewardDto>.Failure(existingRewardCheck.Error!);
+
+        // 4. Create the reward
+        var createResult = await CreateRewardEntityAsync(request);
+        if (createResult.IsFailure)
+            return Result<RewardDto>.Failure(createResult.Error!);
+
+        var reward = createResult.Value;
+
+        // 5. Map and return
+        var rewardDto = _mapper.Map<RewardDto>(reward);
+
+        _logger.LogInformation(
+            "Reward created successfully. RewardId: {RewardId}, RewardOwnerId: {RewardOwnerId}, Name: {Name}, Type: {Type}",
+            reward.Id, reward.RewardOwnerId, reward.Name, reward.RewardType);
+
+        return Result<RewardDto>.Success(rewardDto);
+    }
+
+    private Result<bool> ValidateCreateRewardRequest(RewardForCreationDto request)
+    {
+        if (request.RewardOwnerId == Guid.Empty)
+        {
+            _logger.LogWarning("Validation failed: RewardOwnerId is empty");
+            return Result<bool>.Failure("Reward owner ID is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            _logger.LogWarning("Validation failed: Name is required");
+            return Result<bool>.Failure("Reward name is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.RewardType))
+        {
+            _logger.LogWarning("Validation failed: RewardType is required");
+            return Result<bool>.Failure("Reward type is required");
+        }
+
+        // Validate RewardType value
+        if (!Enum.TryParse<RewardType>(request.RewardType, ignoreCase: true, out _))
+        {
+            _logger.LogWarning(
+                "Validation failed: Invalid RewardType. Value: {RewardType}", 
+                request.RewardType);
+            return Result<bool>.Failure($"Invalid reward type: {request.RewardType}");
+        }
+
+        if (!request.CostPoints.HasValue)
+        {
+            _logger.LogWarning("Validation failed: CostPoints is required");
+            return Result<bool>.Failure("Cost points is required");
+        }
+
+        if (request.CostPoints.Value < 0)
+        {
+            _logger.LogWarning(
+                "Validation failed: CostPoints must be non-negative. Value: {CostPoints}", 
+                request.CostPoints.Value);
+            return Result<bool>.Failure("Cost points must be zero or greater");
+        }
+
+        return Result<bool>.Success(true);
+    }
+
+    private async Task<Result<bool>> VerifyRewardOwnerExistsAsync(Guid rewardOwnerId)
+    {
+        var rewardOwner = await _repository.GetRewardOwnerByIdAsync(rewardOwnerId);
+        if (rewardOwner == null)
+        {
+            _logger.LogWarning(
+                "RewardOwner not found. RewardOwnerId: {RewardOwnerId}", 
+                rewardOwnerId);
+            return Result<bool>.Failure("Reward owner not found");
+        }
+
+        return Result<bool>.Success(true);
+    }
+
+    private async Task<Result<bool>> CheckForExistingRewardAsync(Guid rewardOwnerId)
+    {
+        var existingReward = await _repository.GetRewardByRewardOwnerIdAsync(rewardOwnerId);
+        if (existingReward != null)
+        {
+            _logger.LogWarning(
+                "Reward already exists for RewardOwner. RewardOwnerId: {RewardOwnerId}, ExistingRewardId: {ExistingRewardId}",
+                rewardOwnerId, existingReward.Id);
+            return Result<bool>.Failure("A reward already exists for this reward owner. Only one reward per reward owner is currently allowed");
+        }
+
+        return Result<bool>.Success(true);
+    }
+
+    private async Task<Result<Reward>> CreateRewardEntityAsync(RewardForCreationDto request)
+    {
+        try
+        {
+            var rewardId = Guid.NewGuid();
+            var reward = new Reward
+            {
+                Id = rewardId,
+                RewardOwnerId = request.RewardOwnerId,
+                Name = request.Name,
+                RewardType = Enum.Parse<RewardType>(request.RewardType, ignoreCase: true),
+                CostPoints = request.CostPoints!.Value,
+                IsActive = true, // Default to true
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _repository.CreateRewardAsync(reward);
+
+            _logger.LogInformation(
+                "Reward entity created. RewardId: {RewardId}, RewardOwnerId: {RewardOwnerId}, Name: {Name}",
+                rewardId, reward.RewardOwnerId, reward.Name);
+
+            // Save changes
+            await _repository.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Transaction committed successfully. RewardId: {RewardId}",
+                rewardId);
+
+            return Result<Reward>.Success(reward);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to create reward. RewardOwnerId: {RewardOwnerId}, Name: {Name}, Error: {Error}",
+                request.RewardOwnerId, request.Name, ex.Message);
+            return Result<Reward>.Failure(
+                "An error occurred while creating the reward");
+        }
+    }
+}

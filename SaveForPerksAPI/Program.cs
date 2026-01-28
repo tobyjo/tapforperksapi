@@ -100,7 +100,8 @@ try
 
 builder.Services.AddScoped<ISaveForPerksRepository, SaveForPerksRepository>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
-builder.Services.AddScoped<IRewardService, RewardService>();
+builder.Services.AddScoped<IRewardTransactionService, RewardTransactionService>();
+builder.Services.AddScoped<IRewardManagementService, RewardManagementService>();
 builder.Services.AddScoped<IRewardOwnerUserService, RewardOwnerUserService>();
 
 builder.Services.AddControllers();

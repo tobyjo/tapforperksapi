@@ -133,5 +133,21 @@ namespace SaveForPerksAPI.Repositories
                 .Where(ro => ro.Id == rewardOwnerId)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<Reward?> GetRewardByRewardOwnerIdAsync(Guid rewardOwnerId)
+        {
+            return await _context.Rewards
+                .Where(r => r.RewardOwnerId == rewardOwnerId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task CreateRewardAsync(Reward reward)
+        {
+            if (reward == null)
+            {
+                throw new ArgumentNullException(nameof(reward));
+            }
+            await _context.Rewards.AddAsync(reward);
+        }
     }
 }

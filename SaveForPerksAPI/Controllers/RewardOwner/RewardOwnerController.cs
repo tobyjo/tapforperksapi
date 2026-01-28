@@ -7,14 +7,14 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
     [Route("api/reward-owner")]
     public class RewardOwnerController : BaseApiController
     {
-        private readonly IRewardService rewardService;
+        private readonly IRewardTransactionService _rewardTransactionService;
 
         public RewardOwnerController(
-            IRewardService rewardService,
+            IRewardTransactionService rewardTransactionService,
             ILogger<RewardOwnerScanController> logger)
             : base(logger)
         {
-            this.rewardService = rewardService ?? throw new ArgumentNullException(nameof(rewardService));
+            _rewardTransactionService = rewardTransactionService ?? throw new ArgumentNullException(nameof(rewardTransactionService));
         }
 
         [HttpPost]
@@ -28,7 +28,7 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
                 rewardOwnerWithAdminUserForCreationDto.RewardOwnerUserAuthProviderId);
 
             return await ExecuteAsync(
-                () => rewardService.CreateRewardOwnerAsync(rewardOwnerWithAdminUserForCreationDto),
+                () => _rewardTransactionService.CreateRewardOwnerAsync(rewardOwnerWithAdminUserForCreationDto),
                 nameof(CreateRewardOwnerWithAdminUser));
         }
 

@@ -7,16 +7,16 @@ using SaveForPerksAPI.Repositories;
 
 namespace SaveForPerksAPI.Services;
 
-public class RewardService : IRewardService
+public class RewardTransactionService : IRewardTransactionService
 {
     private readonly ISaveForPerksRepository _repository;
     private readonly IMapper _mapper;
-    private readonly ILogger<RewardService> _logger;
+    private readonly ILogger<RewardTransactionService> _logger;
 
-    public RewardService(
+    public RewardTransactionService(
         ISaveForPerksRepository repository, 
         IMapper mapper,
-        ILogger<RewardService> logger)
+        ILogger<RewardTransactionService> logger)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

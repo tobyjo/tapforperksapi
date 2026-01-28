@@ -37,5 +37,9 @@ namespace SaveForPerksAPI.Repositories
 
         Task<RewardOwner?> GetRewardOwnerByIdAsync(Guid rewardOwnerId);
 
+        Task<Reward?> GetRewardByRewardOwnerIdAsync(Guid rewardOwnerId);
+
+        Task CreateRewardAsync(Reward reward);
+
     }
 }

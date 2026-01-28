@@ -3,7 +3,7 @@ using SaveForPerksAPI.Models;
 
 namespace SaveForPerksAPI.Services;
 
-public interface IRewardService
+public interface IRewardTransactionService
 {
     Task<Result<RewardOwnerWithAdminUserResponseDto>> CreateRewardOwnerAsync(
         RewardOwnerWithAdminUserForCreationDto rewardOwnerWithAdminUserForCreationDto);

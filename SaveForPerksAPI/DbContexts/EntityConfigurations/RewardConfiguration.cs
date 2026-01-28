@@ -62,7 +62,9 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
                 RewardType = RewardType.IncrementalPoints,
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
+            }
+            /*
+            ,
             new Reward
             {
                 Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
@@ -73,6 +75,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
+            */
         );
     }
 }

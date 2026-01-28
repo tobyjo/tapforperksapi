@@ -7,14 +7,14 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
     [Route("api/reward-owner/scans")]
     public class RewardOwnerScanController : BaseApiController
     {
-        private readonly IRewardService rewardService;
+        private readonly IRewardTransactionService _rewardTransactionService;
 
         public RewardOwnerScanController(
-            IRewardService rewardService, 
+            IRewardTransactionService rewardTransactionService, 
             ILogger<RewardOwnerScanController> logger)
             : base(logger)
         {
-            this.rewardService = rewardService ?? throw new ArgumentNullException(nameof(rewardService));
+            _rewardTransactionService = rewardTransactionService ?? throw new ArgumentNullException(nameof(rewardTransactionService));
         }
 
         [HttpGet("{rewardId}/events/{scanEventId}", Name = "GetScanEventForReward")]
@@ -23,7 +23,7 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
             Logger.LogInformation("GetScanEventForReward called with RewardId: {RewardId}, ScanEventId: {ScanEventId}", rewardId, scanEventId);
             
             return await ExecuteAsync(
-                () => rewardService.GetScanEventForRewardAsync(rewardId, scanEventId),
+                () => _rewardTransactionService.GetScanEventForRewardAsync(rewardId, scanEventId),
                 nameof(GetScanEventForReward));
         }
 
@@ -35,7 +35,7 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
             Logger.LogInformation("GetUserBalanceForReward called with RewardId: {RewardId}, QrCodeValue: {QrCodeValue}", rewardId, qrCodeValue);
             
             return await ExecuteAsync(
-                () => rewardService.GetUserBalanceForRewardAsync(rewardId, qrCodeValue),
+                () => _rewardTransactionService.GetUserBalanceForRewardAsync(rewardId, qrCodeValue),
                 nameof(GetUserBalanceForReward));
         }
 
@@ -47,7 +47,7 @@ namespace SaveForPerksAPI.Controllers.RewardOwner
                 scanEventForCreationDto.RewardId, scanEventForCreationDto.QrCodeValue);
             
             return await ExecuteCreatedAsync(
-                () => rewardService.ProcessScanAndRewardsAsync(scanEventForCreationDto),
+                () => _rewardTransactionService.ProcessScanAndRewardsAsync(scanEventForCreationDto),
                 "GetScanEventForReward",
                 v => new { rewardId = v.ScanEvent.RewardId, scanEventId = v.ScanEvent.Id },
                 nameof(CreatePointsAndClaimRewards));

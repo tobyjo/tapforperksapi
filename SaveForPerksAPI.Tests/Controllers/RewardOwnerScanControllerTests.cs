@@ -17,13 +17,13 @@ namespace SaveForPerksAPI.Tests.Controllers;
 /// </summary>
 public class RewardOwnerScanControllerTests
 {
-    private readonly Mock<IRewardService> _mockRewardService;
+    private readonly Mock<IRewardTransactionService> _mockRewardService;
     private readonly Mock<ILogger<RewardOwnerScanController>> _mockLogger;
     private readonly RewardOwnerScanController _controller;
 
     public RewardOwnerScanControllerTests()
     {
-        _mockRewardService = new Mock<IRewardService>();
+        _mockRewardService = new Mock<IRewardTransactionService>();
         _mockLogger = new Mock<ILogger<RewardOwnerScanController>>();
         _controller = new RewardOwnerScanController(_mockRewardService.Object, _mockLogger.Object);
     }
