@@ -116,3 +116,8 @@ Content-Type: application/json
   "QrCodeValue": "QR001-ALICE-9999",
   "NumRewardsToClaim": 1
 }
+
+# User
+###
+
+GET {{url}}user/by-auth/auth0|user001

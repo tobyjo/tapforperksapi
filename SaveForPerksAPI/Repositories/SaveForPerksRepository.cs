@@ -50,6 +50,29 @@ namespace SaveForPerksAPI.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<User?> GetUserByAuthProviderIdAsync(string authProviderId)
+        {
+            return await _context.User
+                .Where(u => u.AuthProviderId == authProviderId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.User
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task CreateUserAsync(User user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            await _context.User.AddAsync(user);
+        }
+
         public async Task<Reward?> GetRewardAsync(Guid rewardId)
         {
             return await _context.Rewards

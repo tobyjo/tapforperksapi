@@ -103,6 +103,7 @@ builder.Services.AddScoped<IQrCodeService, QrCodeService>();
 builder.Services.AddScoped<IRewardTransactionService, RewardTransactionService>();
 builder.Services.AddScoped<IRewardManagementService, RewardManagementService>();
 builder.Services.AddScoped<IRewardOwnerUserService, RewardOwnerUserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

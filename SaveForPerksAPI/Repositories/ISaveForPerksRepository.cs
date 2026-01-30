@@ -15,6 +15,12 @@ namespace SaveForPerksAPI.Repositories
 
         Task<User?> GetUserByQrCodeValueAsync(string qrCodeValue);
 
+        Task<User?> GetUserByAuthProviderIdAsync(string authProviderId);
+
+        Task<User?> GetUserByEmailAsync(string email);
+
+        Task CreateUserAsync(User user);
+
         Task<Reward?> GetRewardAsync(Guid rewardId);
 
         Task<UserBalance?> GetUserBalanceForRewardAsync(Guid userId,  Guid rewardId);
