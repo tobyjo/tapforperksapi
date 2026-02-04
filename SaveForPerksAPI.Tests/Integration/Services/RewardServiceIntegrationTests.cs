@@ -139,7 +139,7 @@ public class RewardServiceIntegrationTests : IDisposable
         result.IsSuccess.Should().BeTrue();
         result.Value!.CurrentBalance.Should().Be(5, "because user had 4 points and we added 1");
         result.Value.RewardAvailable.Should().BeTrue(); // Now has enough!
-        result.Value.TimesClaimable.Should().Be(1);
+        result.Value.NumRewardsAvailable.Should().Be(1);
 
         // Verify database
         var balance = await _fixture.Context.UserBalances
@@ -417,7 +417,7 @@ public class RewardServiceIntegrationTests : IDisposable
             "because the user was created with name 'TestOnlyUser' in our in-memory test data");
         result.Value.QrCodeValue.Should().Be(uniqueQr);
         result.Value.CurrentBalance.Should().Be(12);
-        result.Value.TimesClaimable.Should().Be(2); // 12 / 5 = 2
+        result.Value.NumRewardsAvailable.Should().Be(2); // 12 / 5 = 2
         result.Value.AvailableReward.Should().NotBeNull();
         result.Value.AvailableReward!.RewardName.Should().Be("Free Coffee");
         result.Value.AvailableReward.RequiredPoints.Should().Be(5);
@@ -437,7 +437,7 @@ public class RewardServiceIntegrationTests : IDisposable
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value!.CurrentBalance.Should().Be(0);
-        result.Value.TimesClaimable.Should().Be(0);
+        result.Value.NumRewardsAvailable.Should().Be(0);
         result.Value.AvailableReward.Should().BeNull();
     }
 

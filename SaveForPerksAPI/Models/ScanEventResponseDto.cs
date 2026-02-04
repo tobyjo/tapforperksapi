@@ -7,7 +7,7 @@ public class ScanEventResponseDto
     public int CurrentBalance { get; set; }
     public bool RewardAvailable { get; set; }
     public AvailableRewardDto? AvailableReward { get; set; }
-    public int TimesClaimable { get; set; }
+    public int NumRewardsAvailable { get; set; }
     public ClaimedRewardsDto? ClaimedRewards { get; set; }  // NEW: Info about rewards just claimed
 }
 

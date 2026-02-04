@@ -120,4 +120,16 @@ Content-Type: application/json
 # User
 ###
 
-GET {{url}}user/by-auth/auth0|user001
+GET {{url}}user/by-auth/auth0|user002
+
+
+# Create a new user.
+###
+POST {{url}}user
+Content-Type: application/json
+
+{
+"AuthProviderId": "auth01237",
+"Email": "customer@example.com",
+"Name": "Joe Customer"
+}

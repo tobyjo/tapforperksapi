@@ -91,7 +91,7 @@ public class RewardOwnerScanControllerTests
             QrCodeValue = qrCodeValue,
             UserName = "Test User",
             CurrentBalance = 5,
-            TimesClaimable = 1
+            NumRewardsAvailable = 1
         };
         
         _mockRewardService
@@ -154,7 +154,7 @@ public class RewardOwnerScanControllerTests
             UserName = "Test User",
             CurrentBalance = 5,
             RewardAvailable = true,
-            TimesClaimable = 1
+            NumRewardsAvailable = 1
         };
         
         _mockRewardService
@@ -282,7 +282,7 @@ public class RewardOwnerScanControllerTests
         var exception = Assert.Throws<ArgumentNullException>(() => 
             new RewardOwnerScanController(null!, _mockLogger.Object));
         
-        exception.ParamName.Should().Be("rewardService");
+        exception.ParamName.Should().Be("rewardTransactionService");
     }
 
     [Fact]

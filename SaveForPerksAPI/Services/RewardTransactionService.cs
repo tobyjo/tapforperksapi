@@ -385,7 +385,7 @@ public class RewardTransactionService : IRewardTransactionService
             CurrentBalance = balance.Balance,
             RewardAvailable = false,
             AvailableReward = null,
-            TimesClaimable = 0,
+            NumRewardsAvailable = 0,
             ClaimedRewards = null
         };
 
@@ -407,7 +407,7 @@ public class RewardTransactionService : IRewardTransactionService
             balance.Balance >= reward.CostPoints)
         {
             response.RewardAvailable = true;
-            response.TimesClaimable = balance.Balance / reward.CostPoints;
+            response.NumRewardsAvailable = balance.Balance / reward.CostPoints;
             response.AvailableReward = new AvailableRewardDto
             {
                 RewardId = reward.Id,
@@ -479,7 +479,7 @@ public class RewardTransactionService : IRewardTransactionService
             UserName = user.Name,
             CurrentBalance = balance?.Balance ?? 0,
             AvailableReward = null,
-            TimesClaimable = 0
+            NumRewardsAvailable = 0
         };
 
         // If no balance exists, return empty response
@@ -491,7 +491,7 @@ public class RewardTransactionService : IRewardTransactionService
             reward.CostPoints > 0 && 
             balance.Balance >= reward.CostPoints)
         {
-            response.TimesClaimable = balance.Balance / reward.CostPoints;
+            response.NumRewardsAvailable = balance.Balance / reward.CostPoints;
             response.AvailableReward = new AvailableRewardDto
             {
                 RewardId = reward.Id,

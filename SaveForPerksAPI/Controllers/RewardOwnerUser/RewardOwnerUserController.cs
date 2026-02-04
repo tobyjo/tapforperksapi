@@ -18,6 +18,25 @@ namespace SaveForPerksAPI.Controllers.RewardOwnerUser
             _rewardOwnerUserService = rewardOwnerUserService ?? throw new ArgumentNullException(nameof(rewardOwnerUserService));
         }
 
+
+        // Combines GetRewardOwnersByAuthProviderId and GetRewardOwnerUserByAuthProviderId into one call to just get details on the RewardOwnerUser
+        // and the RewardOwner they belong to
+        [HttpGet("profile/{authProviderId}")]
+        public async Task<ActionResult<IEnumerable<RewardOwnerUserProfileResponseDto>>> GetRewardOwnerUserProfilesByAuthProviderId(string authProviderId)
+        {
+            Logger.LogInformation(
+                "GetRewardOwnerUserProfilesByAuthProviderId called with AuthProviderId: {AuthProviderId}",
+                authProviderId);
+
+            return await ExecuteAsync(
+                () => _rewardOwnerUserService.GetRewardOwnerUserProfilesByAuthProviderIdAsync(authProviderId),
+                nameof(GetRewardOwnerUserProfilesByAuthProviderId));
+        }
+
+
+
+        /* The following could be deprecated and not used ****************/
+
         [HttpGet("{authProviderId}/reward-owners")]
         public async Task<ActionResult<IEnumerable<RewardOwnerDto>>> GetRewardOwnersByAuthProviderId(string authProviderId)
         {

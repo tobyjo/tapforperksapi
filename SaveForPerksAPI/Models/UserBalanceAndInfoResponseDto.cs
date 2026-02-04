@@ -6,7 +6,7 @@ namespace SaveForPerksAPI.Models
         public string UserName { get; set; } = null!;
         public int CurrentBalance { get; set; }
         public AvailableRewardDto? AvailableReward { get; set; }  // Single reward instead of list
-        public int TimesClaimable { get; set; }  // How many times can they claim it?
+        public int NumRewardsAvailable { get; set; }  // How many rewards are available to claim?
     }
 
     public class AvailableRewardForUserDto
