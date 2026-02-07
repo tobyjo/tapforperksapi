@@ -66,6 +66,9 @@ Content-Type: application/json
   "costPoints": 10
 }
 
+# Reward Ownewr Category
+###
+GET {{url}}reward-owner-category
 
 
 # Initial scan of qr code

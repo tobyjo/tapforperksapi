@@ -179,5 +179,12 @@ namespace SaveForPerksAPI.Repositories
             }
             await _context.Rewards.AddAsync(reward);
         }
+
+        public async Task<IEnumerable<RewardOwnerCategory>> GetAllRewardOwnerCategoriesAsync()
+        {
+            return await _context.RewardOwnerCategories
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+        }
     }
 }

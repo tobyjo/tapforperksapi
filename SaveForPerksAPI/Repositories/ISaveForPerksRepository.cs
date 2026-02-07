@@ -49,5 +49,7 @@ namespace SaveForPerksAPI.Repositories
 
         Task CreateRewardAsync(Reward reward);
 
+        Task<IEnumerable<RewardOwnerCategory>> GetAllRewardOwnerCategoriesAsync();
+
     }
 }
