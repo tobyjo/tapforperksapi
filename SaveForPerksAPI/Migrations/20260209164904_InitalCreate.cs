@@ -204,15 +204,6 @@ namespace SaveForPerksAPI.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "business",
-                columns: new[] { "id", "address", "category_id", "created_at", "Description", "metadata", "name" },
-                values: new object[,]
-                {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), "123 High Street, London, UK", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Premium artisan coffee shop chain", null, "The Daily Grind Coffee" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), "456 Market Square, Manchester, UK", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Private event", null, "Smith-Jones Wedding" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "business_category",
                 columns: new[] { "id", "image_url", "name" },
                 values: new object[,]
@@ -223,30 +214,6 @@ namespace SaveForPerksAPI.Migrations
                     { new Guid("44444444-4444-4444-4444-444444444444"), "/images/categories/bakery.png", "Bakery" },
                     { new Guid("55555555-5555-5555-5555-555555555555"), "/images/categories/bar-pub.png", "Bar & Pub" }
                 });
-
-            migrationBuilder.InsertData(
-                table: "customer",
-                columns: new[] { "id", "auth_provider_id", "created_at", "email", "name", "qr_code_value" },
-                values: new object[,]
-                {
-                    { new Guid("99999999-9999-9999-9999-999999999999"), "auth0|user001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "alice@example.com", "Alice Customer", "QR001-ALICE-9999" },
-                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "auth0|user002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "bob@example.com", "Bob Customer", "QR002-BOB-AAAA" },
-                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), "auth0|user003", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "charlie@example.com", "Charlie Customer", "QR003-CHARLIE-BBBB" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "business_user",
-                columns: new[] { "id", "auth_provider_id", "business_id", "created_at", "email", "is_admin", "name" },
-                values: new object[,]
-                {
-                    { new Guid("a1111111-1111-1111-1111-111111111111"), "auth0|admin001", new Guid("11111111-1111-1111-1111-111111111111"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "baristaone@dailygrind.com", true, "Barista One" },
-                    { new Guid("a2222222-2222-2222-2222-222222222222"), "auth0|admin002", new Guid("22222222-2222-2222-2222-222222222222"), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "host@wedding.com", true, "Wedding Host" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "reward",
-                columns: new[] { "id", "business_id", "cost_points", "created_at", "is_active", "metadata", "name", "reward_type" },
-                values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("11111111-1111-1111-1111-111111111111"), 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, null, "Pay for 5 coffees, get sixth free", "incremental_points" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_business_category_id",

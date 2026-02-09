@@ -65,24 +65,6 @@ namespace SaveForPerksAPI.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("business", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Address = "123 High Street, London, UK",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Premium artisan coffee shop chain",
-                            Name = "The Daily Grind Coffee"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Address = "456 Market Square, Manchester, UK",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Private event",
-                            Name = "Smith-Jones Wedding"
-                        });
                 });
 
             modelBuilder.Entity("SaveForPerksAPI.Entities.BusinessCategory", b =>
@@ -193,28 +175,6 @@ namespace SaveForPerksAPI.Migrations
                     b.HasIndex("BusinessId");
 
                     b.ToTable("business_user", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a1111111-1111-1111-1111-111111111111"),
-                            AuthProviderId = "auth0|admin001",
-                            BusinessId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "baristaone@dailygrind.com",
-                            IsAdmin = true,
-                            Name = "Barista One"
-                        },
-                        new
-                        {
-                            Id = new Guid("a2222222-2222-2222-2222-222222222222"),
-                            AuthProviderId = "auth0|admin002",
-                            BusinessId = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "host@wedding.com",
-                            IsAdmin = true,
-                            Name = "Wedding Host"
-                        });
                 });
 
             modelBuilder.Entity("SaveForPerksAPI.Entities.Customer", b =>
@@ -267,35 +227,6 @@ namespace SaveForPerksAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("customer", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
-                            AuthProviderId = "auth0|user001",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "alice@example.com",
-                            Name = "Alice Customer",
-                            QrCodeValue = "QR001-ALICE-9999"
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                            AuthProviderId = "auth0|user002",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "bob@example.com",
-                            Name = "Bob Customer",
-                            QrCodeValue = "QR002-BOB-AAAA"
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                            AuthProviderId = "auth0|user003",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "charlie@example.com",
-                            Name = "Charlie Customer",
-                            QrCodeValue = "QR003-CHARLIE-BBBB"
-                        });
                 });
 
             modelBuilder.Entity("SaveForPerksAPI.Entities.CustomerBalance", b =>
@@ -381,18 +312,6 @@ namespace SaveForPerksAPI.Migrations
                     b.HasIndex("BusinessId");
 
                     b.ToTable("reward", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            BusinessId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CostPoints = 5,
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            Name = "Pay for 5 coffees, get sixth free",
-                            RewardType = "incremental_points"
-                        });
                 });
 
             modelBuilder.Entity("SaveForPerksAPI.Entities.RewardRedemption", b =>

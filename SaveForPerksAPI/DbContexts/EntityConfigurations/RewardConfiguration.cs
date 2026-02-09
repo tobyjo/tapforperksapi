@@ -52,6 +52,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
 
 
         // Seed data using enum
+         /*
         builder.HasData(
             new Reward
             {
@@ -63,7 +64,7 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
-            /*
+           
             ,
             new Reward
             {
@@ -75,7 +76,8 @@ public class RewardConfiguration : IEntityTypeConfiguration<Reward>
                 IsActive = true,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
-            */
+            
         );
+         */
     }
 }

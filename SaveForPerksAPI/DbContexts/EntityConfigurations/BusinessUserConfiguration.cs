@@ -47,6 +47,7 @@ public class BusinessUserConfiguration : IEntityTypeConfiguration<BusinessUser>
             .HasForeignKey(d => d.BusinessId);
 
         // Seed data
+        /*
         builder.HasData(
             new BusinessUser
             {
@@ -69,5 +70,6 @@ public class BusinessUserConfiguration : IEntityTypeConfiguration<BusinessUser>
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
         );
+        */
     }
 }

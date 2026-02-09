@@ -41,6 +41,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnName("qr_code_value");
 
         // Seed data
+        /*
         builder.HasData(
             new Customer
             {
@@ -70,5 +71,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
         );
+        */
     }
 }

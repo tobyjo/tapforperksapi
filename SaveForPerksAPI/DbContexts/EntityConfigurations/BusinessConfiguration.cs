@@ -44,6 +44,7 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
             .OnDelete(DeleteBehavior.SetNull);
 
         // Seed data
+        /*
         builder.HasData(
             new Business
             {
@@ -62,5 +63,6 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
         );
+        */
     }
 }
