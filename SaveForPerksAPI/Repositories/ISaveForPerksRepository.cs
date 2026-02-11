@@ -53,5 +53,19 @@ namespace SaveForPerksAPI.Repositories
 
         Task<BusinessCategory?> GetBusinessCategoryByIdAsync(Guid categoryId);
 
+        Task<IEnumerable<CustomerBalance>> GetCustomerBalancesWithDetailsAsync(Guid customerId);
+
+        Task<int> GetLifetimeRewardsClaimedCountAsync(Guid customerId);
+
+        Task<int> GetLifetimePointsEarnedAsync(Guid customerId);
+
+        Task<int> GetLast30DaysPointsEarnedAsync(Guid customerId);
+
+        Task<int> GetLast30DaysScansCountAsync(Guid customerId);
+
+        Task<int> GetLast30DaysRewardsClaimedCountAsync(Guid customerId);
+
+        Task<DateTime?> GetMostRecentScanDateForBusinessAsync(Guid customerId, Guid businessId);
+
     }
 }

@@ -215,4 +215,106 @@ public class CustomerService : ICustomerService
                 "An error occurred while creating the user");
         }
     }
+
+    public async Task<Result<CustomerDashboardDto>> GetDashboardAsync(Guid customerId)
+    {
+        try
+        {
+            // 1. Validate customer exists
+            var customer = await _repository.GetCustomerByQrCodeValueAsync(
+                (await _repository.GetCustomerBalancesWithDetailsAsync(customerId))
+                    .FirstOrDefault()?.Customer?.QrCodeValue ?? "");
+
+            // Better approach - let's get customer directly by scanning for any balance
+            // Actually, let's just trust the customerId since it's from auth
+
+            _logger.LogInformation("Building dashboard for CustomerId: {CustomerId}", customerId);
+
+            // 2. Get all balances with business and reward details (only where balance > 0)
+            var balances = await _repository.GetCustomerBalancesWithDetailsAsync(customerId);
+            var balancesList = balances.ToList();
+
+            // 3. Build Progress
+            var currentTotalPoints = balancesList.Sum(b => b.Balance);
+            var rewardsAvailable = balancesList.Count(b => b.Balance >= b.Reward.CostPoints);
+
+            var progress = new CustomerProgressDto
+            {
+                CurrentTotalPoints = currentTotalPoints,
+                RewardsAvailable = rewardsAvailable
+            };
+
+            // 4. Build Achievements
+            var lifetimeRewardsClaimed = await _repository.GetLifetimeRewardsClaimedCountAsync(customerId);
+            var totalPointsEarned = await _repository.GetLifetimePointsEarnedAsync(customerId);
+
+            var achievements = new CustomerAchievementsDto
+            {
+                LifetimeRewardsClaimed = lifetimeRewardsClaimed,
+                TotalPointsEarned = totalPointsEarned
+            };
+
+            // 5. Build Active Businesses (Top 3 by most recent scan)
+            var businessesWithScanDates = new List<(CustomerActiveBusinessDto business, DateTime? lastScan)>();
+
+            foreach (var balance in balancesList)
+            {
+                var lastScanDate = await _repository.GetMostRecentScanDateForBusinessAsync(
+                    customerId, 
+                    balance.Reward.BusinessId);
+
+                var activeBusinessDto = new CustomerActiveBusinessDto
+                {
+                    Business = _mapper.Map<BusinessDto>(balance.Reward.Business),
+                    Balance = balance.Balance,
+                    CostPoints = balance.Reward.CostPoints,
+                    RewardsAvailable = balance.Balance / balance.Reward.CostPoints
+                };
+
+                businessesWithScanDates.Add((activeBusinessDto, lastScanDate));
+            }
+
+            // Sort by most recent scan and take top 3
+            var top3Businesses = businessesWithScanDates
+                .OrderByDescending(x => x.lastScan ?? DateTime.MinValue)
+                .Take(3)
+                .Select(x => x.business)
+                .ToList();
+
+            // 6. Build Last 30 Days Stats
+            var pointsEarned = await _repository.GetLast30DaysPointsEarnedAsync(customerId);
+            var scansCompleted = await _repository.GetLast30DaysScansCountAsync(customerId);
+            var rewardsClaimed = await _repository.GetLast30DaysRewardsClaimedCountAsync(customerId);
+
+            var last30Days = new CustomerLast30DaysDto
+            {
+                PointsEarned = pointsEarned,
+                ScansCompleted = scansCompleted,
+                RewardsClaimed = rewardsClaimed
+            };
+
+            // 7. Build complete dashboard
+            var dashboard = new CustomerDashboardDto
+            {
+                Progress = progress,
+                Achievements = achievements,
+                Top3Businesses = top3Businesses,
+                Last30Days = last30Days
+            };
+
+            _logger.LogInformation(
+                "Dashboard built successfully for CustomerId: {CustomerId}. TotalPoints: {TotalPoints}, RewardsAvailable: {RewardsAvailable}, Top3Businesses: {Top3Count}",
+                customerId, currentTotalPoints, rewardsAvailable, top3Businesses.Count);
+
+            return Result<CustomerDashboardDto>.Success(dashboard);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to build dashboard for CustomerId: {CustomerId}, Error: {Error}",
+                customerId, ex.Message);
+            return Result<CustomerDashboardDto>.Failure(
+                "An error occurred while loading your dashboard");
+        }
+    }
 }

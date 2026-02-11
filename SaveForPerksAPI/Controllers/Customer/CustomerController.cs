@@ -42,5 +42,17 @@ namespace SaveForPerksAPI.Controllers.Customer
                 () => _customerService.CreateCustomerAsync(customerForCreationDto),
                 nameof(CreateCustomer));
         }
+
+        [HttpGet("{customerId}/dashboard")]
+        public async Task<ActionResult<CustomerDashboardDto>> GetDashboard(Guid customerId)
+        {
+            Logger.LogInformation(
+                "GetDashboard called for CustomerId: {CustomerId}",
+                customerId);
+
+            return await ExecuteAsync(
+                () => _customerService.GetDashboardAsync(customerId),
+                nameof(GetDashboard));
+        }
     }
 }

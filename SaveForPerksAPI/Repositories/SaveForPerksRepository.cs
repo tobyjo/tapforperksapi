@@ -197,5 +197,66 @@ namespace SaveForPerksAPI.Repositories
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<IEnumerable<CustomerBalance>> GetCustomerBalancesWithDetailsAsync(Guid customerId)
+        {
+            return await _context.CustomerBalances
+                .Include(cb => cb.Reward)
+                    .ThenInclude(r => r.Business)
+                        .ThenInclude(b => b.Category)
+                .Where(cb => cb.CustomerId == customerId && cb.Balance > 0)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetLifetimeRewardsClaimedCountAsync(Guid customerId)
+        {
+            return await _context.RewardRedemptions
+                .Where(rr => rr.CustomerId == customerId)
+                .CountAsync();
+        }
+
+        public async Task<int> GetLifetimePointsEarnedAsync(Guid customerId)
+        {
+            return await _context.ScanEvents
+                .Where(se => se.CustomerId == customerId)
+                .SumAsync(se => se.PointsChange);
+        }
+
+        public async Task<int> GetLast30DaysPointsEarnedAsync(Guid customerId)
+        {
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            return await _context.ScanEvents
+                .Where(se => se.CustomerId == customerId && se.ScannedAt >= thirtyDaysAgo)
+                .SumAsync(se => se.PointsChange);
+        }
+
+        public async Task<int> GetLast30DaysScansCountAsync(Guid customerId)
+        {
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            return await _context.ScanEvents
+                .Where(se => se.CustomerId == customerId && se.ScannedAt >= thirtyDaysAgo)
+                .CountAsync();
+        }
+
+        public async Task<int> GetLast30DaysRewardsClaimedCountAsync(Guid customerId)
+        {
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            return await _context.RewardRedemptions
+                .Where(rr => rr.CustomerId == customerId && rr.RedeemedAt >= thirtyDaysAgo)
+                .CountAsync();
+        }
+
+        public async Task<DateTime?> GetMostRecentScanDateForBusinessAsync(Guid customerId, Guid businessId)
+        {
+            return await _context.ScanEvents
+                .Join(_context.Rewards, 
+                    se => se.RewardId, 
+                    r => r.Id, 
+                    (se, r) => new { se, r })
+                .Where(x => x.se.CustomerId == customerId && x.r.BusinessId == businessId)
+                .OrderByDescending(x => x.se.ScannedAt)
+                .Select(x => (DateTime?)x.se.ScannedAt)
+                .FirstOrDefaultAsync();
+        }
     }
 }
