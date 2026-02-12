@@ -317,4 +317,54 @@ public class CustomerService : ICustomerService
                 "An error occurred while loading your dashboard");
         }
     }
+
+    public async Task<Result<bool>> DeleteCustomerAsync(Guid customerId)
+    {
+        try
+        {
+            _logger.LogInformation("Starting deletion process for CustomerId: {CustomerId}", customerId);
+
+            // 1. Verify customer exists
+            var customer = await _repository.GetCustomerByIdAsync(customerId);
+            if (customer == null)
+            {
+                _logger.LogWarning("Customer not found for deletion. CustomerId: {CustomerId}", customerId);
+                return Result<bool>.Failure("Customer not found");
+            }
+
+            // 2. Delete related records in order (most dependent first)
+            // Delete customer_balance records
+            await _repository.DeleteCustomerBalancesAsync(customerId);
+            _logger.LogInformation("Deleted customer balances for CustomerId: {CustomerId}", customerId);
+
+            // Delete reward_redemption records
+            await _repository.DeleteRewardRedemptionsAsync(customerId);
+            _logger.LogInformation("Deleted reward redemptions for CustomerId: {CustomerId}", customerId);
+
+            // Delete scan_event records
+            await _repository.DeleteScanEventsAsync(customerId);
+            _logger.LogInformation("Deleted scan events for CustomerId: {CustomerId}", customerId);
+
+            // 3. Finally delete the customer
+            await _repository.DeleteCustomerAsync(customer);
+            _logger.LogInformation("Deleted customer record for CustomerId: {CustomerId}", customerId);
+
+            // 4. Save all changes in one transaction
+            await _repository.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Customer deleted successfully. CustomerId: {CustomerId}, Email: {Email}, Name: {Name}",
+                customerId, customer.Email, customer.Name);
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to delete customer. CustomerId: {CustomerId}, Error: {Error}",
+                customerId, ex.Message);
+            return Result<bool>.Failure(
+                "An error occurred while deleting the customer");
+        }
+    }
 }

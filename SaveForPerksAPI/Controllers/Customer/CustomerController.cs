@@ -54,5 +54,27 @@ namespace SaveForPerksAPI.Controllers.Customer
                 () => _customerService.GetDashboardAsync(customerId),
                 nameof(GetDashboard));
         }
+
+        [HttpDelete("{customerId}")]
+        public async Task<ActionResult> DeleteCustomer(Guid customerId)
+        {
+            Logger.LogInformation(
+                "DeleteCustomer called for CustomerId: {CustomerId}",
+                customerId);
+
+            var result = await _customerService.DeleteCustomerAsync(customerId);
+
+            if (result.IsSuccess)
+            {
+                return NoContent(); // 204 No Content - successful deletion
+            }
+
+            if (result.Error == "Customer not found")
+            {
+                return NotFound(result.Error); // 404 Not Found
+            }
+
+            return BadRequest(result.Error); // 400 Bad Request for other errors
+        }
     }
 }

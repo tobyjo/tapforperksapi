@@ -67,5 +67,15 @@ namespace SaveForPerksAPI.Repositories
 
         Task<DateTime?> GetMostRecentScanDateForBusinessAsync(Guid customerId, Guid businessId);
 
+        Task<Customer?> GetCustomerByIdAsync(Guid customerId);
+
+        Task DeleteCustomerBalancesAsync(Guid customerId);
+
+        Task DeleteRewardRedemptionsAsync(Guid customerId);
+
+        Task DeleteScanEventsAsync(Guid customerId);
+
+        Task DeleteCustomerAsync(Customer customer);
+
     }
 }

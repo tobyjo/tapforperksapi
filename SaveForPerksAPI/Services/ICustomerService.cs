@@ -10,4 +10,6 @@ public interface ICustomerService
     Task<Result<CustomerDto>> CreateCustomerAsync(CustomerForCreationDto request);
 
     Task<Result<CustomerDashboardDto>> GetDashboardAsync(Guid customerId);
+
+    Task<Result<bool>> DeleteCustomerAsync(Guid customerId);
 }

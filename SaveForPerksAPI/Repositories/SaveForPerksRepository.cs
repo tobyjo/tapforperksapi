@@ -258,5 +258,45 @@ namespace SaveForPerksAPI.Repositories
                 .Select(x => (DateTime?)x.se.ScannedAt)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<Customer?> GetCustomerByIdAsync(Guid customerId)
+        {
+            return await _context.Customer
+                .Where(c => c.Id == customerId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task DeleteCustomerBalancesAsync(Guid customerId)
+        {
+            var balances = await _context.CustomerBalances
+                .Where(cb => cb.CustomerId == customerId)
+                .ToListAsync();
+
+            _context.CustomerBalances.RemoveRange(balances);
+        }
+
+        public async Task DeleteRewardRedemptionsAsync(Guid customerId)
+        {
+            var redemptions = await _context.RewardRedemptions
+                .Where(rr => rr.CustomerId == customerId)
+                .ToListAsync();
+
+            _context.RewardRedemptions.RemoveRange(redemptions);
+        }
+
+        public async Task DeleteScanEventsAsync(Guid customerId)
+        {
+            var scanEvents = await _context.ScanEvents
+                .Where(se => se.CustomerId == customerId)
+                .ToListAsync();
+
+            _context.ScanEvents.RemoveRange(scanEvents);
+        }
+
+        public async Task DeleteCustomerAsync(Customer customer)
+        {
+            _context.Customer.Remove(customer);
+            await Task.CompletedTask;
+        }
     }
 }
