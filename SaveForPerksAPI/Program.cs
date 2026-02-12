@@ -10,6 +10,9 @@ using Serilog.Events;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using Auth0.AspNetCore.Authentication.Api;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 
 // Configure Serilog FIRST (before building the app)
 Log.Logger = new LoggerConfiguration()
@@ -39,6 +42,17 @@ try
     Log.Information("========================================");
 
     var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.AddAuth0ApiAuthentication(options =>
+    {
+        options.Domain = builder.Configuration["Auth0:Domain"];
+        options.JwtBearerOptions = new JwtBearerOptions
+        {
+            Audience = builder.Configuration["Auth0:Audience"]
+        };
+    });
+
+    builder.Services.AddAuthorization();
 
     // Use Serilog for all logging
     builder.Host.UseSerilog();
@@ -182,6 +196,7 @@ else
 
     // app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
