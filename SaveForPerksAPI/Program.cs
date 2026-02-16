@@ -120,6 +120,9 @@ builder.Services.AddScoped<IBusinessUserService, BusinessUserService>();
 builder.Services.AddScoped<IBusinessCategoryService, BusinessCategoryService>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

@@ -12,17 +12,20 @@ public class CustomerService : ICustomerService
     private readonly IMapper _mapper;
     private readonly ILogger<CustomerService> _logger;
     private readonly IQrCodeService _qrCodeService;
+    private readonly IAuthorizationService _authorizationService;
 
     public CustomerService(
         ISaveForPerksRepository repository,
         IMapper mapper,
         ILogger<CustomerService> logger,
-        IQrCodeService qrCodeService)
+        IQrCodeService qrCodeService,
+        IAuthorizationService authorizationService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _qrCodeService = qrCodeService ?? throw new ArgumentNullException(nameof(qrCodeService));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     }
 
     public async Task<Result<CustomerDto>> GetCustomerByAuthProviderIdAsync(string authProviderId)
@@ -62,29 +65,34 @@ public class CustomerService : ICustomerService
         if (validationResult.IsFailure)
             return Result<CustomerDto>.Failure(validationResult.Error!);
 
-        // 2. Check for duplicate email
+        // 2. Validate JWT token matches auth provider ID
+        var authCheck = _authorizationService.ValidateAuthProviderIdMatch(request.AuthProviderId);
+        if (authCheck.IsFailure)
+            return Result<CustomerDto>.Failure(authCheck.Error!);
+
+        // 3. Check for duplicate email
         var emailCheck = await CheckDuplicateEmailAsync(request.Email);
         if (emailCheck.IsFailure)
             return Result<CustomerDto>.Failure(emailCheck.Error!);
 
-        // 3. Check for duplicate authProviderId
+        // 4. Check for duplicate authProviderId
         var authProviderCheck = await CheckDuplicateAuthProviderIdAsync(request.AuthProviderId);
         if (authProviderCheck.IsFailure)
             return Result<CustomerDto>.Failure(authProviderCheck.Error!);
 
-        // 4. Generate unique QR code
+        // 5. Generate unique QR code
         var qrCodeResult = await GenerateUniqueQrCodeAsync();
         if (qrCodeResult.IsFailure)
             return Result<CustomerDto>.Failure(qrCodeResult.Error!);
 
-        // 5. Create the user
+        // 6. Create the user
         var createResult = await CreateCustomerEntityAsync(request, qrCodeResult.Value);
         if (createResult.IsFailure)
             return Result<CustomerDto>.Failure(createResult.Error!);
 
         var user = createResult.Value;
 
-        // 6. Map and return
+        // 7. Map and return
         var userDto = _mapper.Map<CustomerDto>(user);
 
         _logger.LogInformation(
@@ -220,13 +228,10 @@ public class CustomerService : ICustomerService
     {
         try
         {
-            // 1. Validate customer exists
-            var customer = await _repository.GetCustomerByQrCodeValueAsync(
-                (await _repository.GetCustomerBalancesWithDetailsAsync(customerId))
-                    .FirstOrDefault()?.Customer?.QrCodeValue ?? "");
-
-            // Better approach - let's get customer directly by scanning for any balance
-            // Actually, let's just trust the customerId since it's from auth
+            // 1. Validate JWT token matches customer's auth provider ID
+            var authCheck = await _authorizationService.ValidateCustomerAuthorizationAsync(customerId);
+            if (authCheck.IsFailure)
+                return Result<CustomerDashboardDto>.Failure(authCheck.Error!);
 
             _logger.LogInformation("Building dashboard for CustomerId: {CustomerId}", customerId);
 
@@ -324,7 +329,12 @@ public class CustomerService : ICustomerService
         {
             _logger.LogInformation("Starting deletion process for CustomerId: {CustomerId}", customerId);
 
-            // 1. Verify customer exists
+            // 1. Validate JWT token matches customer's auth provider ID
+            var authCheck = await _authorizationService.ValidateCustomerAuthorizationAsync(customerId);
+            if (authCheck.IsFailure)
+                return Result<bool>.Failure(authCheck.Error!);
+
+            // 2. Verify customer exists (already done in ValidateCustomerAuthorizationAsync, but get reference)
             var customer = await _repository.GetCustomerByIdAsync(customerId);
             if (customer == null)
             {
@@ -332,7 +342,7 @@ public class CustomerService : ICustomerService
                 return Result<bool>.Failure("Customer not found");
             }
 
-            // 2. Delete related records in order (most dependent first)
+            // 3. Delete related records in order (most dependent first)
             // Delete customer_balance records
             await _repository.DeleteCustomerBalancesAsync(customerId);
             _logger.LogInformation("Deleted customer balances for CustomerId: {CustomerId}", customerId);
@@ -345,11 +355,11 @@ public class CustomerService : ICustomerService
             await _repository.DeleteScanEventsAsync(customerId);
             _logger.LogInformation("Deleted scan events for CustomerId: {CustomerId}", customerId);
 
-            // 3. Finally delete the customer
+            // 4. Finally delete the customer
             await _repository.DeleteCustomerAsync(customer);
             _logger.LogInformation("Deleted customer record for CustomerId: {CustomerId}", customerId);
 
-            // 4. Save all changes in one transaction
+            // 5. Save all changes in one transaction
             await _repository.SaveChangesAsync();
 
             _logger.LogInformation(
