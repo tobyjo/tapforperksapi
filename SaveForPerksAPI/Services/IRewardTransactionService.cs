@@ -13,10 +13,12 @@ public interface IRewardTransactionService
     Task<Result<CustomerBalanceAndInfoResponseDto>> GetCustomerBalanceForRewardAsync(
         Guid businessId,
         Guid rewardId, 
-        string qrCodeValue);
+        string qrCodeValue,
+        Guid businessUserId);
 
     Task<Result<ScanEventDto>> GetScanEventForRewardAsync(
         Guid businessId,
         Guid rewardId, 
-        Guid scanEventId);
+        Guid scanEventId,
+        Guid businessUserId);
 }

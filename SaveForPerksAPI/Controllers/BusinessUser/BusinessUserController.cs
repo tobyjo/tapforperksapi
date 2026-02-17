@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace SaveForPerksAPI.Controllers.BusinessUser
 {
     [Route("api/business-user")]
+    [Authorize]
     public class BusinessUserController : BaseApiController
     {
         private readonly IBusinessUserService _businessUserService;
@@ -37,7 +38,7 @@ namespace SaveForPerksAPI.Controllers.BusinessUser
 
 
         /* The following could be deprecated and not used ****************/
-
+        /*
         [HttpGet("{authProviderId}/businesses")]
         public async Task<ActionResult<IEnumerable<BusinessDto>>> GetBusinessesByAuthProviderId(string authProviderId)
         {
@@ -61,7 +62,7 @@ namespace SaveForPerksAPI.Controllers.BusinessUser
                 () => _businessUserService.GetBusinessUserByAuthProviderIdAsync(authProviderId),
                 nameof(GetBusinessUserByAuthProviderId));
         }
-
+        */
 
     }
 }

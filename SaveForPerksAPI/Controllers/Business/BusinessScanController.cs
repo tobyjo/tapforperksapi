@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SaveForPerksAPI.Models;
 using SaveForPerksAPI.Services;
 
 namespace SaveForPerksAPI.Controllers.Business
 {
     [Route("api/business/{businessId}/scans")]
+    [Authorize]
     public class BusinessScanController : BaseApiController
     {
         private readonly IRewardTransactionService _rewardTransactionService;
@@ -17,33 +19,37 @@ namespace SaveForPerksAPI.Controllers.Business
             _rewardTransactionService = rewardTransactionService ?? throw new ArgumentNullException(nameof(rewardTransactionService));
         }
 
+        /* Currently only used as an endpoint for when returning from CreatePointsAndClaimRewards to get that last scan event. */
         [HttpGet("{rewardId}/events/{scanEventId}", Name = "GetScanEventForReward")]
         public async Task<ActionResult<ScanEventDto>> GetScanEventForReward(
             Guid businessId,
             Guid rewardId, 
-            Guid scanEventId)
+            Guid scanEventId,
+            [FromHeader(Name = "X-BusinessUser-Id")] Guid businessUserId)
         {
             Logger.LogInformation(
-                "GetScanEventForReward called with BusinessId: {BusinessId}, RewardId: {RewardId}, ScanEventId: {ScanEventId}", 
-                businessId, rewardId, scanEventId);
+                "GetScanEventForReward called with BusinessId: {BusinessId}, RewardId: {RewardId}, ScanEventId: {ScanEventId}, BusinessUserId: {BusinessUserId}", 
+                businessId, rewardId, scanEventId, businessUserId);
 
             return await ExecuteAsync(
-                () => _rewardTransactionService.GetScanEventForRewardAsync(businessId, rewardId, scanEventId),
+                () => _rewardTransactionService.GetScanEventForRewardAsync(businessId, rewardId, scanEventId, businessUserId),
                 nameof(GetScanEventForReward));
         }
+      
 
         [HttpGet("{rewardId}/customerbalance/{qrCodeValue}", Name = "GetCustomerBalanceForReward")]
         public async Task<ActionResult<CustomerBalanceAndInfoResponseDto>> GetCustomerBalanceForReward(
             Guid businessId,
             Guid rewardId, 
-            string qrCodeValue)
+            string qrCodeValue,
+            [FromHeader(Name = "X-BusinessUser-Id")] Guid businessUserId)
         {
             Logger.LogInformation(
-                "GetCustomerBalanceForReward called with BusinessId: {BusinessId}, RewardId: {RewardId}, QrCodeValue: {QrCodeValue}", 
-                businessId, rewardId, qrCodeValue);
+                "GetCustomerBalanceForReward called with BusinessId: {BusinessId}, RewardId: {RewardId}, QrCodeValue: {QrCodeValue}, BusinessUserId: {BusinessUserId}", 
+                businessId, rewardId, qrCodeValue, businessUserId);
 
             return await ExecuteAsync(
-                () => _rewardTransactionService.GetCustomerBalanceForRewardAsync(businessId, rewardId, qrCodeValue),
+                () => _rewardTransactionService.GetCustomerBalanceForRewardAsync(businessId, rewardId, qrCodeValue, businessUserId),
                 nameof(GetCustomerBalanceForReward));
         }
 

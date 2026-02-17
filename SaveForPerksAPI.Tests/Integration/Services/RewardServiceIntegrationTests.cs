@@ -445,7 +445,8 @@ public class RewardServiceIntegrationTests : IDisposable
         var result = await _fixture.Service.GetCustomerBalanceForRewardAsync(
             businessUser.BusinessId,
             reward.Id,
-            uniqueQr);
+            uniqueQr,
+            Guid.Empty); // Auth is mocked in tests
 
         // Assert
         result.IsSuccess.Should().BeTrue("because the user exists in our in-memory test database");
@@ -469,7 +470,8 @@ public class RewardServiceIntegrationTests : IDisposable
         var result = await _fixture.Service.GetCustomerBalanceForRewardAsync(
             businessUser.BusinessId,
             reward.Id,
-            user.QrCodeValue);
+            user.QrCodeValue,
+            Guid.Empty); // Auth is mocked in tests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -489,7 +491,8 @@ public class RewardServiceIntegrationTests : IDisposable
         var result = await _fixture.Service.GetCustomerBalanceForRewardAsync(
             businessUser.BusinessId,
             reward.Id,
-            "INVALID-QR");
+            "INVALID-QR",
+            Guid.Empty); // Auth is mocked in tests
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -513,7 +516,8 @@ public class RewardServiceIntegrationTests : IDisposable
         var result = await _fixture.Service.GetScanEventForRewardAsync(
             businessUser.BusinessId,
             reward.Id,
-            scanEvent.Id);
+            scanEvent.Id,
+            Guid.Empty); // Auth is mocked in tests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -534,7 +538,8 @@ public class RewardServiceIntegrationTests : IDisposable
         var result = await _fixture.Service.GetScanEventForRewardAsync(
             businessUser.BusinessId,
             reward.Id,
-            Guid.NewGuid());
+            Guid.NewGuid(),
+            Guid.Empty); // Auth is mocked in tests
 
         // Assert
         result.IsFailure.Should().BeTrue();

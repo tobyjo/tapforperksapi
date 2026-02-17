@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SaveForPerksAPI.Common;
 using SaveForPerksAPI.DbContexts;
 using SaveForPerksAPI.Entities;
 using SaveForPerksAPI.Models;
@@ -76,8 +77,20 @@ public class DatabaseFixture : IDisposable
             builder.AddConsole().SetMinimumLevel(LogLevel.Warning));
         Logger = loggerFactory.CreateLogger<RewardTransactionService>();
 
+        // Create mock AuthorizationService that always returns success
+        var mockAuthService = new Mock<IAuthorizationService>();
+        mockAuthService
+            .Setup(a => a.ValidateBusinessUserAuthorizationAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(Result<bool>.Success(true));
+        mockAuthService
+            .Setup(a => a.ValidateAuthProviderIdMatch(It.IsAny<string>()))
+            .Returns(Result<bool>.Success(true));
+        mockAuthService
+            .Setup(a => a.ValidateCustomerAuthorizationAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(Result<bool>.Success(true));
+
         // Create real service with in-memory dependencies
-        Service = new RewardTransactionService(Repository, Mapper, Logger);
+        Service = new RewardTransactionService(Repository, Mapper, Logger, mockAuthService.Object);
     }
 
     public void Dispose()

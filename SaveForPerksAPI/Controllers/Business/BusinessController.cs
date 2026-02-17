@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SaveForPerksAPI.Models;
 using SaveForPerksAPI.Services;
 
 namespace SaveForPerksAPI.Controllers.Business
 {
     [Route("api/business")]
+    [Authorize]
     public class BusinessController : BaseApiController
     {
         private readonly IBusinessService _businessService;

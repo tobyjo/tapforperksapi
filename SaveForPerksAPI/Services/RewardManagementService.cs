@@ -11,47 +11,55 @@ public class RewardManagementService : IRewardManagementService
     private readonly ISaveForPerksRepository _repository;
     private readonly IMapper _mapper;
     private readonly ILogger<RewardManagementService> _logger;
+    private readonly IAuthorizationService _authorizationService;
 
     public RewardManagementService(
         ISaveForPerksRepository repository,
         IMapper mapper,
-        ILogger<RewardManagementService> logger)
+        ILogger<RewardManagementService> logger,
+        IAuthorizationService authorizationService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     }
 
     public async Task<Result<RewardDto>> CreateRewardAsync(RewardForCreationDto request, Guid businessUserId)
     {
-        // 1. Validate request
+        // 1. Validate JWT token matches business user's auth provider ID
+        var authCheck = await _authorizationService.ValidateBusinessUserAuthorizationAsync(businessUserId);
+        if (authCheck.IsFailure)
+            return Result<RewardDto>.Failure(authCheck.Error!);
+
+        // 2. Validate request
         var validationResult = ValidateCreateRewardRequest(request);
         if (validationResult.IsFailure)
             return Result<RewardDto>.Failure(validationResult.Error!);
 
-        // 2. Verify Business exists
+        // 3. Verify Business exists
         var businessCheck = await VerifyBusinessExistsAsync(request.BusinessId);
         if (businessCheck.IsFailure)
             return Result<RewardDto>.Failure(businessCheck.Error!);
 
-        // 3. Verify BusinessUser belongs to Business
+        // 4. Verify BusinessUser belongs to Business
         var userAuthCheck = await VerifyUserBelongsToBusinessAsync(businessUserId, request.BusinessId);
         if (userAuthCheck.IsFailure)
             return Result<RewardDto>.Failure(userAuthCheck.Error!);
 
-        // 4. Check for existing reward for this Business
+        // 5. Check for existing reward for this Business
         var existingRewardCheck = await CheckForExistingRewardAsync(request.BusinessId);
         if (existingRewardCheck.IsFailure)
             return Result<RewardDto>.Failure(existingRewardCheck.Error!);
 
-        // 5. Create the reward
+        // 6. Create the reward
         var createResult = await CreateRewardEntityAsync(request);
         if (createResult.IsFailure)
             return Result<RewardDto>.Failure(createResult.Error!);
 
         var reward = createResult.Value;
 
-        // 6. Map and return
+        // 7. Map and return
         var rewardDto = _mapper.Map<RewardDto>(reward);
 
         _logger.LogInformation(
@@ -63,12 +71,17 @@ public class RewardManagementService : IRewardManagementService
 
     public async Task<Result<RewardDto>> UpdateRewardAsync(Guid rewardId, RewardForUpdateDto request, Guid businessUserId)
     {
-        // 1. Validate request
+        // 1. Validate JWT token matches business user's auth provider ID
+        var authCheck = await _authorizationService.ValidateBusinessUserAuthorizationAsync(businessUserId);
+        if (authCheck.IsFailure)
+            return Result<RewardDto>.Failure(authCheck.Error!);
+
+        // 2. Validate request
         var validationResult = ValidateUpdateRewardRequest(request);
         if (validationResult.IsFailure)
             return Result<RewardDto>.Failure(validationResult.Error!);
 
-        // 2. Get reward and validate it exists
+        // 3. Get reward and validate it exists
         var reward = await _repository.GetRewardAsync(rewardId);
         if (reward == null)
         {
@@ -76,7 +89,7 @@ public class RewardManagementService : IRewardManagementService
             return Result<RewardDto>.Failure("Reward not found");
         }
 
-        // 3. Get BusinessUser and validate
+        // 4. Get BusinessUser and validate
         var businessUser = await _repository.GetBusinessUserByIdAsync(businessUserId);
         if (businessUser == null)
         {
@@ -84,7 +97,7 @@ public class RewardManagementService : IRewardManagementService
             return Result<RewardDto>.Failure("User not found");
         }
 
-        // 4. Verify BusinessUser belongs to the same Business as the Reward
+        // 5. Verify BusinessUser belongs to the same Business as the Reward
         if (businessUser.BusinessId != reward.BusinessId)
         {
             _logger.LogWarning(
@@ -93,7 +106,7 @@ public class RewardManagementService : IRewardManagementService
             return Result<RewardDto>.Failure("You do not have permission to modify this reward");
         }
 
-        // 5. Verify BusinessUser is an admin
+        // 6. Verify BusinessUser is an admin
         if (!businessUser.IsAdmin)
         {
             _logger.LogWarning(
@@ -102,14 +115,14 @@ public class RewardManagementService : IRewardManagementService
             return Result<RewardDto>.Failure("Only administrators can modify rewards");
         }
 
-        // 6. Update the reward
+        // 7. Update the reward
         var updateResult = await UpdateRewardEntityAsync(reward, request, businessUserId);
         if (updateResult.IsFailure)
             return Result<RewardDto>.Failure(updateResult.Error!);
 
         var updatedReward = updateResult.Value;
 
-        // 7. Map and return
+        // 8. Map and return
         var rewardDto = _mapper.Map<RewardDto>(updatedReward);
 
         _logger.LogInformation(
@@ -348,24 +361,29 @@ public class RewardManagementService : IRewardManagementService
 
     public async Task<Result<IEnumerable<RewardDto>>> GetRewardsByBusinessIdAsync(Guid businessId, Guid businessUserId)
     {
-        // 1. Validate input
+        // 1. Validate JWT token matches business user's auth provider ID
+        var authCheck = await _authorizationService.ValidateBusinessUserAuthorizationAsync(businessUserId);
+        if (authCheck.IsFailure)
+            return Result<IEnumerable<RewardDto>>.Failure(authCheck.Error!);
+
+        // 2. Validate input
         if (businessId == Guid.Empty)
         {
             _logger.LogWarning("GetRewardsByBusinessId called with empty BusinessId");
             return Result<IEnumerable<RewardDto>>.Failure("Business ID is required");
         }
 
-        // 2. Verify Business exists
+        // 3. Verify Business exists
         var rewardOwnerCheck = await VerifyBusinessExistsAsync(businessId);
         if (rewardOwnerCheck.IsFailure)
             return Result<IEnumerable<RewardDto>>.Failure(rewardOwnerCheck.Error!);
 
-        // 3. Verify BusinessUser belongs to Business
+        // 4. Verify BusinessUser belongs to Business
         var userAuthCheck = await VerifyUserBelongsToBusinessAsync(businessUserId, businessId);
         if (userAuthCheck.IsFailure)
             return Result<IEnumerable<RewardDto>>.Failure(userAuthCheck.Error!);
 
-        // 4. Get reward for this Business
+        // 5. Get reward for this Business
         var reward = await _repository.GetRewardByBusinessIdAsync(businessId);
 
         if (reward == null)
@@ -377,7 +395,7 @@ public class RewardManagementService : IRewardManagementService
             return Result<IEnumerable<RewardDto>>.Success(new List<RewardDto>());
         }
 
-        // 5. Map and return
+        // 6. Map and return
         var rewardDto = _mapper.Map<RewardDto>(reward);
 
         _logger.LogInformation(

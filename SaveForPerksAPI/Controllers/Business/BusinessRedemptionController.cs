@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SaveForPerksAPI.Entities;
 using SaveForPerksAPI.Models;
@@ -8,6 +9,7 @@ namespace SaveForPerksAPI.Controllers.Business
 {
     [ApiController]
     [Route("api/business/redemption")]
+    [Authorize]
     public class BusinessRedemptionController : ControllerBase
     {
         private readonly ISaveForPerksRepository saveForPerksRepository;

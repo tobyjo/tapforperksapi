@@ -12,15 +12,18 @@ public class RewardTransactionService : IRewardTransactionService
     private readonly ISaveForPerksRepository _repository;
     private readonly IMapper _mapper;
     private readonly ILogger<RewardTransactionService> _logger;
+    private readonly IAuthorizationService _authorizationService;
 
     public RewardTransactionService(
         ISaveForPerksRepository repository, 
         IMapper mapper,
-        ILogger<RewardTransactionService> logger)
+        ILogger<RewardTransactionService> logger,
+        IAuthorizationService authorizationService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     }
 
     public async Task<Result<ScanEventResponseDto>> ProcessScanAndRewardsAsync(
@@ -28,31 +31,36 @@ public class RewardTransactionService : IRewardTransactionService
         Guid businessUserId,
         ScanEventForCreationDto request)
     {
-        // 1. Validate BusinessUser belongs to Business
+        // 1. Validate JWT token matches business user's auth provider ID
+        var jwtAuthCheck = await _authorizationService.ValidateBusinessUserAuthorizationAsync(businessUserId);
+        if (jwtAuthCheck.IsFailure)
+            return Result<ScanEventResponseDto>.Failure(jwtAuthCheck.Error!);
+
+        // 2. Validate BusinessUser belongs to Business
         var authCheck = await ValidateBusinessUserAuthorizationAsync(businessId, businessUserId);
         if (authCheck.IsFailure)
             return Result<ScanEventResponseDto>.Failure(authCheck.Error!);
 
-        // 2. Validate Reward belongs to Business
+        // 3. Validate Reward belongs to Business
         var rewardCheck = await ValidateRewardBelongsToBusinessAsync(businessId, request.RewardId);
         if (rewardCheck.IsFailure)
             return Result<ScanEventResponseDto>.Failure(rewardCheck.Error!);
 
-        // 3. Validate request
+        // 4. Validate request
         var validationResult = await ValidateRequestAsync(request);
         if (validationResult.IsFailure)
             return Result<ScanEventResponseDto>.Failure(validationResult.Error!);
 
         var (customer, reward, existingBalance) = validationResult.Value;
 
-        // 4. Process transaction
+        // 5. Process transaction
         var processResult = await ProcessTransactionAsync(customer, reward, existingBalance, businessUserId, request);
         if (processResult.IsFailure)
             return Result<ScanEventResponseDto>.Failure(processResult.Error!);
 
         var (updatedBalance, scanEvent, redemptionIds) = processResult.Value;
 
-        // 5. Build response
+        // 6. Build response
         var response = BuildResponse(customer, reward, updatedBalance, scanEvent, request.NumRewardsToClaim, redemptionIds);
 
         return Result<ScanEventResponseDto>.Success(response);
@@ -343,24 +351,30 @@ public class RewardTransactionService : IRewardTransactionService
     public async Task<Result<CustomerBalanceAndInfoResponseDto>> GetCustomerBalanceForRewardAsync(
         Guid businessId,
         Guid rewardId, 
-        string qrCodeValue)
+        string qrCodeValue,
+        Guid businessUserId)
     {
-        // 1. Validate Reward belongs to Business
+        // 1. Validate JWT token matches business user's auth provider ID
+        var jwtAuthCheck = await _authorizationService.ValidateBusinessUserAuthorizationAsync(businessUserId);
+        if (jwtAuthCheck.IsFailure)
+            return Result<CustomerBalanceAndInfoResponseDto>.Failure(jwtAuthCheck.Error!);
+
+        // 2. Validate Reward belongs to Business
         var rewardCheck = await ValidateRewardBelongsToBusinessAsync(businessId, rewardId);
         if (rewardCheck.IsFailure)
             return Result<CustomerBalanceAndInfoResponseDto>.Failure(rewardCheck.Error!);
 
-        // 2. Validate customer and reward exist
+        // 3. Validate customer and reward exist
         var validationResult = await ValidateUserAndRewardAsync(rewardId, qrCodeValue);
         if (validationResult.IsFailure)
             return Result<CustomerBalanceAndInfoResponseDto>.Failure(validationResult.Error!);
 
         var (customer, reward) = validationResult.Value;
 
-        // 3. Get customer balance
+        // 4. Get customer balance
         var balance = await _repository.GetCustomerBalanceForRewardAsync(customer.Id, rewardId);
 
-        // 4. Build response
+        // 5. Build response
         var response = BuildUserBalanceResponse(customer, reward, balance, qrCodeValue);
 
         return Result<CustomerBalanceAndInfoResponseDto>.Success(response);
@@ -433,14 +447,20 @@ public class RewardTransactionService : IRewardTransactionService
     public async Task<Result<ScanEventDto>> GetScanEventForRewardAsync(
         Guid businessId,
         Guid rewardId, 
-        Guid scanEventId)
+        Guid scanEventId,
+        Guid businessUserId)
     {
-        // 1. Validate Reward belongs to Business
+        // 1. Validate JWT token matches business user's auth provider ID
+        var jwtAuthCheck = await _authorizationService.ValidateBusinessUserAuthorizationAsync(businessUserId);
+        if (jwtAuthCheck.IsFailure)
+            return Result<ScanEventDto>.Failure(jwtAuthCheck.Error!);
+
+        // 2. Validate Reward belongs to Business
         var rewardCheck = await ValidateRewardBelongsToBusinessAsync(businessId, rewardId);
         if (rewardCheck.IsFailure)
             return Result<ScanEventDto>.Failure(rewardCheck.Error!);
 
-        // 2. Get scan event
+        // 3. Get scan event
         var scanEvent = await _repository.GetScanEventAsync(rewardId, scanEventId);
 
         if (scanEvent == null)

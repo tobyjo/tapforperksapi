@@ -11,48 +11,56 @@ public class BusinessService : IBusinessService
     private readonly ISaveForPerksRepository _repository;
     private readonly IMapper _mapper;
     private readonly ILogger<BusinessService> _logger;
+    private readonly IAuthorizationService _authorizationService;
 
     public BusinessService(
         ISaveForPerksRepository repository,
         IMapper mapper,
-        ILogger<BusinessService> logger)
+        ILogger<BusinessService> logger,
+        IAuthorizationService authorizationService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     }
 
     public async Task<Result<BusinessWithAdminUserResponseDto>> CreateBusinessAsync(
         BusinessWithAdminUserForCreationDto request)
     {
-        // 1. Validate request
+        // 1. Validate JWT token matches auth provider ID
+        var authCheck = _authorizationService.ValidateAuthProviderIdMatch(request.BusinessUserAuthProviderId);
+        if (authCheck.IsFailure)
+            return Result<BusinessWithAdminUserResponseDto>.Failure(authCheck.Error!);
+
+        // 2. Validate request
         var validationResult = ValidateCreateBusinessRequest(request);
         if (validationResult.IsFailure)
             return Result<BusinessWithAdminUserResponseDto>.Failure(validationResult.Error!);
 
-        // 2. Validate category exists
+        // 3. Validate category exists
         var categoryCheck = await ValidateCategoryExistsAsync(request.BusinessCategoryId);
         if (categoryCheck.IsFailure)
             return Result<BusinessWithAdminUserResponseDto>.Failure(categoryCheck.Error!);
 
-        // 3. Check for duplicate email
+        // 4. Check for duplicate email
         var duplicateEmailCheck = await CheckDuplicateEmailAsync(request.BusinessUserEmail);
         if (duplicateEmailCheck.IsFailure)
             return Result<BusinessWithAdminUserResponseDto>.Failure(duplicateEmailCheck.Error!);
 
-        // 4. Check for duplicate auth provider ID
+        // 5. Check for duplicate auth provider ID
         var duplicateAuthCheck = await CheckDuplicateAuthProviderIdAsync(request.BusinessUserAuthProviderId);
         if (duplicateAuthCheck.IsFailure)
             return Result<BusinessWithAdminUserResponseDto>.Failure(duplicateAuthCheck.Error!);
 
-        // 5. Create entities in transaction
+        // 6. Create entities in transaction
         var createResult = await CreateBusinessAndUserAsync(request);
         if (createResult.IsFailure)
             return Result<BusinessWithAdminUserResponseDto>.Failure(createResult.Error!);
 
         var (business, businessUser) = createResult.Value;
 
-        // 5. Build response
+        // 7. Build response
         var response = BuildCreateBusinessResponse(business, businessUser);
 
         _logger.LogInformation(

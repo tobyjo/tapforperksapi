@@ -35,6 +35,7 @@ public class RewardOwnerScanControllerTests
     {
         // Arrange
         var businessId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var businessUserId = Guid.Parse("A1111111-1111-1111-1111-111111111111");
         var rewardId = Guid.NewGuid();
         var scanEventId = Guid.NewGuid();
         var expectedDto = new ScanEventDto 
@@ -45,11 +46,11 @@ public class RewardOwnerScanControllerTests
         };
 
         _mockRewardService
-            .Setup(s => s.GetScanEventForRewardAsync(businessId, rewardId, scanEventId))
+            .Setup(s => s.GetScanEventForRewardAsync(businessId, rewardId, scanEventId, businessUserId))
             .ReturnsAsync(Result<ScanEventDto>.Success(expectedDto));
 
         // Act
-        var result = await _controller.GetScanEventForReward(businessId, rewardId, scanEventId);
+        var result = await _controller.GetScanEventForReward(businessId, rewardId, scanEventId, businessUserId);
 
         // Assert
         var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
@@ -63,15 +64,16 @@ public class RewardOwnerScanControllerTests
     {
         // Arrange
         var businessId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var businessUserId = Guid.Parse("A1111111-1111-1111-1111-111111111111");
         var rewardId = Guid.NewGuid();
         var scanEventId = Guid.NewGuid();
 
         _mockRewardService
-            .Setup(s => s.GetScanEventForRewardAsync(businessId, rewardId, scanEventId))
+            .Setup(s => s.GetScanEventForRewardAsync(businessId, rewardId, scanEventId, businessUserId))
             .ReturnsAsync(Result<ScanEventDto>.Failure("Scan event not found"));
 
         // Act
-        var result = await _controller.GetScanEventForReward(businessId, rewardId, scanEventId);
+        var result = await _controller.GetScanEventForReward(businessId, rewardId, scanEventId, businessUserId);
 
         // Assert
         var notFoundResult = result.Result.Should().BeOfType<NotFoundObjectResult>().Subject;
@@ -87,6 +89,7 @@ public class RewardOwnerScanControllerTests
     {
         // Arrange
         var businessId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var businessUserId = Guid.Parse("A1111111-1111-1111-1111-111111111111");
         var rewardId = Guid.NewGuid();
         var qrCodeValue = "QR001-TEST";
         var expectedResponse = new CustomerBalanceAndInfoResponseDto
@@ -98,11 +101,11 @@ public class RewardOwnerScanControllerTests
         };
 
         _mockRewardService
-            .Setup(s => s.GetCustomerBalanceForRewardAsync(businessId, rewardId, qrCodeValue))
+            .Setup(s => s.GetCustomerBalanceForRewardAsync(businessId, rewardId, qrCodeValue, businessUserId))
             .ReturnsAsync(Result<CustomerBalanceAndInfoResponseDto>.Success(expectedResponse));
 
         // Act
-        var result = await _controller.GetCustomerBalanceForReward(businessId, rewardId, qrCodeValue);
+        var result = await _controller.GetCustomerBalanceForReward(businessId, rewardId, qrCodeValue, businessUserId);
 
         // Assert
         var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
@@ -116,15 +119,16 @@ public class RewardOwnerScanControllerTests
     {
         // Arrange
         var businessId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var businessUserId = Guid.Parse("A1111111-1111-1111-1111-111111111111");
         var rewardId = Guid.NewGuid();
         var qrCodeValue = "INVALID-QR";
 
         _mockRewardService
-            .Setup(s => s.GetCustomerBalanceForRewardAsync(businessId, rewardId, qrCodeValue))
+            .Setup(s => s.GetCustomerBalanceForRewardAsync(businessId, rewardId, qrCodeValue, businessUserId))
             .ReturnsAsync(Result<CustomerBalanceAndInfoResponseDto>.Failure("Customer not found"));
 
         // Act
-        var result = await _controller.GetCustomerBalanceForReward(businessId, rewardId, qrCodeValue);
+        var result = await _controller.GetCustomerBalanceForReward(businessId, rewardId, qrCodeValue, businessUserId);
 
         // Assert
         var notFoundResult = result.Result.Should().BeOfType<NotFoundObjectResult>().Subject;

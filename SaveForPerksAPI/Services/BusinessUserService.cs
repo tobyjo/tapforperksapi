@@ -10,15 +10,18 @@ public class BusinessUserService : IBusinessUserService
     private readonly ISaveForPerksRepository _repository;
     private readonly IMapper _mapper;
     private readonly ILogger<BusinessUserService> _logger;
+    private readonly IAuthorizationService _authorizationService;
 
     public BusinessUserService(
         ISaveForPerksRepository repository,
         IMapper mapper,
-        ILogger<BusinessUserService> logger)
+        ILogger<BusinessUserService> logger,
+        IAuthorizationService authorizationService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     }
 
     public async Task<Result<IEnumerable<BusinessDto>>> GetBusinessesByAuthProviderIdAsync(string authProviderId)
@@ -105,9 +108,14 @@ public class BusinessUserService : IBusinessUserService
             return Result<IEnumerable<BusinessUserProfileResponseDto>>.Failure("Auth provider ID is required");
         }
 
-        // 2. Get BusinessUser by authProviderId
+        // 2. Validate JWT token matches auth provider ID
+        var authCheck = _authorizationService.ValidateAuthProviderIdMatch(authProviderId);
+        if (authCheck.IsFailure)
+            return Result<IEnumerable<BusinessUserProfileResponseDto>>.Failure(authCheck.Error!);
+
+        // 3. Get BusinessUser by authProviderId
         var businessUser = await _repository.GetBusinessUserByAuthProviderIdAsync(authProviderId);
-        
+
         if (businessUser == null)
         {
             _logger.LogInformation(
@@ -118,9 +126,9 @@ public class BusinessUserService : IBusinessUserService
                 new List<BusinessUserProfileResponseDto>());
         }
 
-        // 3. Get Business
+        // 4. Get Business
         var business = await _repository.GetBusinessByIdAsync(businessUser.BusinessId);
-        
+
         if (business == null)
         {
             _logger.LogWarning(
@@ -131,16 +139,16 @@ public class BusinessUserService : IBusinessUserService
                 new List<BusinessUserProfileResponseDto>());
         }
 
-        // 4. Determine if profile exists based on Business.Name
+        // 5. Determine if profile exists based on Business.Name
         var businessProfileExists = !string.IsNullOrWhiteSpace(business.Name);
 
-        // 5. Get rewards for this business
+        // 6. Get rewards for this business
         var reward = await _repository.GetRewardByBusinessIdAsync(businessUser.BusinessId);
         var rewards = reward != null 
             ? new List<RewardDto> { _mapper.Map<RewardDto>(reward) }
             : new List<RewardDto>();
 
-        // 6. Map and build response
+        // 7. Map and build response
         var businessDto = _mapper.Map<BusinessDto>(business);
         var businessUserDto = _mapper.Map<BusinessUserDto>(businessUser);
 
